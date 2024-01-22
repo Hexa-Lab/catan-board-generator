@@ -1,5 +1,6 @@
 .App {
   text-align: center;
+  background-color: #006994;
 }
 
 .App-logo {
@@ -36,3 +37,55 @@
     transform: rotate(360deg);
   }
 }
+
+.board {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 20px;
+}
+
+.tile {
+  width: 100px;
+  height: 86px;
+  background-color: #ccc;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: -25px;
+  margin-bottom: -43px;
+}
+
+.port-right {
+  position: absolute;
+  right: -10px; /* adjust as needed */
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.port-left {
+  position: absolute;
+  left: -10px; /* adjust as needed */
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* Add styles for other orientations */
+
+
+.number-token {
+  width: 20px; /* Size of the token */
+  height: 20px; /* Size of the token */
+  background-color: white; /* Token color */
+  border-radius: 50%; /* Make it circular */
+  border: 2px solid black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
