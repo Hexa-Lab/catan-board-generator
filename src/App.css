@@ -73,19 +73,16 @@
 
 /* Add styles for other orientations */
 
-
 .number-token {
-  width: 20px; /* Size of the token */
-  height: 20px; /* Size of the token */
-  background-color: white; /* Token color */
-  border-radius: 50%; /* Make it circular */
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  background-color: white;
   border: 2px solid black;
+  border-radius: 50%;
+  color: black;
   display: flex;
   justify-content: center;
   align-items: center;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%); /* Center the token */
 }
-

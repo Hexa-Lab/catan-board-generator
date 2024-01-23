@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { HexGrid, Layout, Pattern, Hexagon, Text } from "react-hexgrid";
 
 const BaseGame = () => {
@@ -176,6 +176,10 @@ const BaseGame = () => {
     },
   ]);
 
+  useEffect(() => {
+    shuffleBoard();
+  }, boardLayout);
+
   function calculatePips(number) {
     switch (number) {
       case 2:
@@ -239,28 +243,30 @@ const BaseGame = () => {
   function placeSixesAndEights() {
     let sixesAndEights = [6, 6, 8, 8];
     shuffleArray(sixesAndEights);
-
+  
+    let resourceSixOrEight = { forest: false, brick: false, sheep: false, wheat: false, ore: false };
+  
     // Create an array of indices for hexagons that are not desert
     let nonDesertIndices = boardLayout
       .map((hex, index) => (hex.fill !== "desert" ? index : -1))
-      .filter((index) => index !== -1);
-
+      .filter(index => index !== -1);
+  
     for (let number of sixesAndEights) {
-      shuffleArray(nonDesertIndices); // Shuffle the indices for randomness
+      shuffleArray(nonDesertIndices);
       let placed = false;
-
+  
       for (let index of nonDesertIndices) {
         let hex = boardLayout[index];
-        if (hex.number === null && !isNeighborWithSixOrEight(hex.id, number)) {
+        if (hex.number === null && !isNeighborWithSixOrEight(hex.id, number) && !resourceSixOrEight[hex.fill]) {
           hex.number = number;
           placed = true;
+          resourceSixOrEight[hex.fill] = true; // Mark this resource as having a 6 or 8
           break;
         }
       }
-
-      // If a number could not be placed, reset and start over
+  
       if (!placed) {
-        boardLayout.forEach((hex) => {
+        boardLayout.forEach(hex => {
           if (hex.fill !== "desert") hex.number = null;
         });
         placeSixesAndEights(); // Retry recursively
@@ -268,6 +274,7 @@ const BaseGame = () => {
       }
     }
   }
+  
 
   function shuffleFills() {
     // Shuffle 'fill' attributes including the desert
@@ -278,19 +285,46 @@ const BaseGame = () => {
     }
   }
 
+  function isNeighborWithSameNumber(hexId, number) {
+    const neighbors = boardLayout.find((hex) => hex.id === hexId).neighbors;
+    return neighbors.some((neighborId) => {
+      const neighbor = boardLayout[neighborId];
+      return neighbor.number === number;
+    });
+  }
+  
   function fillInOtherNumbers() {
     let otherNumbers = [2, 3, 3, 4, 4, 5, 5, 9, 9, 10, 10, 11, 11, 12];
     shuffleArray(otherNumbers);
-
-    boardLayout.forEach((hex) => {
-      if (hex.fill !== "desert" && hex.number === null) {
-        hex.number = otherNumbers.pop();
+  
+    for (const hex of boardLayout) {
+      if (hex.fill === "desert" || hex.number !== null) continue;
+  
+      let placed = false;
+      for (let i = 0; i < otherNumbers.length; i++) {
+        let currentNumber = otherNumbers[i];
+        if (!isNeighborWithSameNumber(hex.id, currentNumber)) {
+          hex.number = currentNumber;
+          otherNumbers.splice(i, 1);
+          placed = true;
+          break;
+        }
       }
-    });
+  
+      // If a number could not be placed, indicate the need for a reset
+      if (!placed) {
+        console.log("could not place a number")
+        return false;
+      }
+    }
+  
+    return true; // All numbers placed successfully
   }
-
+  
   function shuffleNumbers() {
     let attempts = 0;
+    let success = false;
+  
     do {
       attempts++;
       // Reset numbers
@@ -299,13 +333,19 @@ const BaseGame = () => {
       );
 
       placeSixesAndEights();
-      fillInOtherNumbers();
-    } while (!isValidPipDistribution() && attempts < 1000);
+      success = fillInOtherNumbers();
 
-    if (attempts >= 1000) {
-      console.log("Failed to find a valid distribution after 1000 attempts");
+      // Check if valid pip distribution is achieved
+      if (success) {
+        success = isValidPipDistribution();
+      }
+    } while (!success && attempts < 100);
+  
+    if (attempts >= 100 || !success) {
+      console.log(`Failed to find a valid distribution after ${attempts} attempts`);
     }
-  }
+}
+
 
   function shuffleBoard() {
     shuffleFills();
@@ -335,24 +375,25 @@ const BaseGame = () => {
             >
               {hex.number && (
                 <Text
-                  fontSize={6}
+                  fontFamily="Calibri"
+                  fontSize={8}
                   strokeWidth={0.2}
                   stroke={
-                    hex.number === 8 || hex.number === 6 ? "black" : "white"
+                    hex.number === 8 || hex.number === 6 ? "black" : "black"
                   }
-                  fill={hex.number === 8 || hex.number === 6 ? "red" : "black"}
+                  fill={hex.number === 8 || hex.number === 6 ? "red" : "white"}
                 >
                   {hex.number}
                 </Text>
               )}
             </Hexagon>
           ))}
-          <Pattern id="forest" link="https://i.ibb.co/BszsS4H/wood.png" />
-          <Pattern id="ore" link="https://i.ibb.co/1zNCk9k/ore.png" />
-          <Pattern id="wheat" link="https://i.ibb.co/3SrMs4c/wheat.png" />
-          <Pattern id="sheep" link="https://i.ibb.co/BrW1jwT/sheep.png" />
-          <Pattern id="brick" link="https://i.ibb.co/p1JSVgR/brick.png" />
-          <Pattern id="desert" link="https://i.ibb.co/gPnRM4R/desert.png" />
+          <Pattern id="forest" link="/assets/wood.png" />
+          <Pattern id="ore" link="/assets/ore.png" />
+          <Pattern id="wheat" link="/assets/wheat.png" />
+          <Pattern id="sheep" link="/assets/sheep.png" />
+          <Pattern id="brick" link="/assets/brick.png" />
+          <Pattern id="desert" link="/assets/desert.png" />
           <Pattern
             id="any-top-left"
             link="https://i.ibb.co/VNGt99L/any-bottom-left.png"
