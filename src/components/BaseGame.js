@@ -212,15 +212,15 @@ const BaseGame = () => {
     }
 
     return (
-      pipCounts.forest >= 10 &&
+      pipCounts.forest >= 12 &&
       pipCounts.forest <= 15 &&
-      pipCounts.brick >= 7 &&
+      pipCounts.brick >= 9 &&
       pipCounts.brick <= 12 &&
-      pipCounts.sheep >= 10 &&
+      pipCounts.sheep >= 12 &&
       pipCounts.sheep <= 15 &&
-      pipCounts.wheat >= 10 &&
+      pipCounts.wheat >= 12 &&
       pipCounts.wheat <= 15 &&
-      pipCounts.ore >= 7 &&
+      pipCounts.ore >= 9 &&
       pipCounts.ore <= 12
     );
   }
@@ -274,17 +274,46 @@ const BaseGame = () => {
       }
     }
   }
-  
 
   function shuffleFills() {
-    // Shuffle 'fill' attributes including the desert
-    const fills = boardLayout.map((hex) => hex.fill);
-    shuffleArray(fills);
-    for (let i = 0; i < boardLayout.length; i++) {
-      boardLayout[i].fill = fills[i];
+    let validFills = false;
+    let attempts = 0;
+  
+    while (!validFills && attempts < 1000) {
+      // Shuffle 'fill' attributes including the desert
+      const fills = boardLayout.map((hex) => hex.fill);
+      shuffleArray(fills);
+      for (let i = 0; i < boardLayout.length; i++) {
+        boardLayout[i].fill = fills[i];
+      }
+  
+      // Check if the new fills are valid
+      validFills = checkFillValidity();
+  
+      attempts++;
+    }
+  
+    if (attempts >= 1000) {
+      console.log("Failed to find a valid fill distribution after 1000 attempts");
     }
   }
-
+  
+  function checkFillValidity() {
+    for (const hex of boardLayout) {
+      if (hex.fill === "desert") continue;
+      let sameTypeCount = 0;
+  
+      for (const neighborId of hex.neighbors) {
+        const neighbor = boardLayout[neighborId];
+        if (neighbor.fill === hex.fill) {
+          sameTypeCount++;
+          if (sameTypeCount > 1) return false; // More than one neighbor of the same type
+        }
+      }
+    }
+    return true; // All hexes have valid neighbors
+  }
+  
   function isNeighborWithSameNumber(hexId, number) {
     const neighbors = boardLayout.find((hex) => hex.id === hexId).neighbors;
     return neighbors.some((neighborId) => {
@@ -345,7 +374,6 @@ const BaseGame = () => {
       console.log(`Failed to find a valid distribution after ${attempts} attempts`);
     }
 }
-
 
   function shuffleBoard() {
     shuffleFills();
