@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { HexGrid, Layout, Pattern, Hexagon, Text } from "react-hexgrid";
-import {IconButton} from '@mui/material'
+import { IconButton } from '@mui/material'
 import ShuffleIcon from '@mui/icons-material/Shuffle';
 
 
@@ -246,18 +246,18 @@ const BaseGame = () => {
   function placeSixesAndEights() {
     let sixesAndEights = [6, 6, 8, 8];
     shuffleArray(sixesAndEights);
-  
+
     let resourceSixOrEight = { forest: false, brick: false, sheep: false, wheat: false, ore: false };
-  
+
     // Create an array of indices for hexagons that are not desert
     let nonDesertIndices = boardLayout
       .map((hex, index) => (hex.fill !== "desert" ? index : -1))
       .filter(index => index !== -1);
-  
+
     for (let number of sixesAndEights) {
       shuffleArray(nonDesertIndices);
       let placed = false;
-  
+
       for (let index of nonDesertIndices) {
         let hex = boardLayout[index];
         if (hex.number === null && !isNeighborWithSixOrEight(hex.id, number) && !resourceSixOrEight[hex.fill]) {
@@ -267,7 +267,7 @@ const BaseGame = () => {
           break;
         }
       }
-  
+
       if (!placed) {
         boardLayout.forEach(hex => {
           if (hex.fill !== "desert") hex.number = null;
@@ -281,7 +281,7 @@ const BaseGame = () => {
   function shuffleFills() {
     let validFills = false;
     let attempts = 0;
-  
+
     while (!validFills && attempts < 1000) {
       // Shuffle 'fill' attributes including the desert
       const fills = boardLayout.map((hex) => hex.fill);
@@ -289,23 +289,23 @@ const BaseGame = () => {
       for (let i = 0; i < boardLayout.length; i++) {
         boardLayout[i].fill = fills[i];
       }
-  
+
       // Check if the new fills are valid
       validFills = checkFillValidity();
-  
+
       attempts++;
     }
-  
+
     if (attempts >= 1000) {
       console.log("Failed to find a valid fill distribution after 1000 attempts");
     }
   }
-  
+
   function checkFillValidity() {
     for (const hex of boardLayout) {
-      if (hex.fill === "desert") continue;
+      if (hex.fill === "desert" || hex.fill === "any-top-left") continue;
       let sameTypeCount = 0;
-  
+
       for (const neighborId of hex.neighbors) {
         const neighbor = boardLayout[neighborId];
         if (neighbor.fill === hex.fill) {
@@ -316,7 +316,7 @@ const BaseGame = () => {
     }
     return true; // All hexes have valid neighbors
   }
-  
+
   function isNeighborWithSameNumber(hexId, number) {
     const neighbors = boardLayout.find((hex) => hex.id === hexId).neighbors;
     return neighbors.some((neighborId) => {
@@ -324,14 +324,14 @@ const BaseGame = () => {
       return neighbor.number === number;
     });
   }
-  
+
   function fillInOtherNumbers() {
     let otherNumbers = [2, 3, 3, 4, 4, 5, 5, 9, 9, 10, 10, 11, 11, 12];
     shuffleArray(otherNumbers);
-  
+
     for (const hex of boardLayout) {
       if (hex.fill === "desert" || hex.number !== null) continue;
-  
+
       let placed = false;
       for (let i = 0; i < otherNumbers.length; i++) {
         let currentNumber = otherNumbers[i];
@@ -342,26 +342,26 @@ const BaseGame = () => {
           break;
         }
       }
-  
+
       // If a number could not be placed, indicate the need for a reset
       if (!placed) {
         console.log("could not place a number")
         return false;
       }
     }
-  
+
     return true; // All numbers placed successfully
   }
-  
+
   function shuffleNumbers() {
     let attempts = 0;
     let success = false;
-  
+
     do {
       attempts++;
       // Reset numbers
       boardLayout.forEach(
-        (hex) => (hex.number = hex.fill === "desert" ? null : undefined)
+        (hex) => (hex.number = (hex.fill === "desert" || hex.fill === "any-top-left") ? null : undefined)
       );
 
       placeSixesAndEights();
@@ -372,11 +372,11 @@ const BaseGame = () => {
         success = isValidPipDistribution();
       }
     } while (!success && attempts < 100);
-  
+
     if (attempts >= 100 || !success) {
       console.log(`Failed to find a valid distribution after ${attempts} attempts`);
     }
-}
+  }
 
   function shuffleBoard() {
     shuffleFills();
@@ -386,67 +386,80 @@ const BaseGame = () => {
   }
 
   return (
-    <div>
-      <HexGrid width={900} height={900} viewBox="-50 -50 100 100">
-        <Layout
-          size={{ x: 10, y: 10 }}
-          flat={true}
-          spacing={1}
-          origin={{ x: 0, y: 0 }}
-        >
-          {boardLayout.map((hex, index) => (
-            <Hexagon
-              key={index}
-              q={hex.q}
-              r={hex.r}
-              s={hex.s}
-              stroke="#006994"
-              strokeWidth={0.3}
-              fill={hex.fill}
-            >
-              {hex.number && (
-                <Text
-                  fontFamily="Calibri"
-                  fontSize={8}
-                  strokeWidth={0.2}
-                  stroke={
-                    hex.number === 8 || hex.number === 6 ? "black" : "black"
-                  }
-                  fill={hex.number === 8 || hex.number === 6 ? "red" : "white"}
-                >
-                  {hex.number}
-                </Text>
-              )}
-            </Hexagon>
-          ))}
-          <Pattern id="forest" link="/assets/wood.png" />
-          <Pattern id="ore" link="/assets/ore.png" />
-          <Pattern id="wheat" link="/assets/wheat.png" />
-          <Pattern id="sheep" link="/assets/sheep.png" />
-          <Pattern id="brick" link="/assets/brick.png" />
-          <Pattern id="desert" link="/assets/desert.png" />
-          <Pattern
-            id="any-top-left"
-            link="https://i.ibb.co/VNGt99L/any-bottom-left.png"
-          />
-          <Pattern
-            id="any-bottom-left"
-            link="https://i.ibb.co/MND5qK0/any-bottom-right.png"
-          />
-          <Pattern id="any-left" link="https://i.ibb.co/FbDryXJ/any-down.png" />
-        </Layout>
-      </HexGrid>
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh" }}>
+      <div className="hexgrid-container">
+        <HexGrid width={1000} height={1000} viewBox="-60 -60 120 120"
+          style={{ transform: "rotate(90deg)" }}>
+          <Layout
+            size={{ x: 10, y: 10 }}
+            flat={true}
+            spacing={1}
+            origin={{ x: 0, y: 0 }}
+          >
+            {boardLayout.map((hex, index) => (
+              <Hexagon
+                key={index}
+                q={hex.q}
+                r={hex.r}
+                s={hex.s}
+                stroke="#006994"
+                strokeWidth={0.3}
+                fill={hex.fill}
+              >
+                {hex.number && (
+                  <>
+                    <Text 
+                    fontSize={65}
+                    stroke="black"
+                    strokeWidth={0.1}
+                    fill="tan"
+                    style={{ transform: "translateY(-16.5px)" }}
+                    >.</Text>
+                    <Text
+                      fontFamily="Calibri"
+                      fontSize={5}
+                      strokeWidth={0.2}
+                      stroke={
+                        hex.number === 8 || hex.number === 6 ? "none" : "none"
+                      }
+                      fill={hex.number === 8 || hex.number === 6 ? "#8b0000" : "black"}
+                      style={{ transform: "rotate(270deg)" }}
+                    >
+                      {hex.number}
+                    </Text>
+                  </>
+                )}
+              </Hexagon>
+            ))}
+            <Pattern id="forest" link="/assets/wood.png" />
+            <Pattern id="ore" link="/assets/ore.png" />
+            <Pattern id="wheat" link="/assets/wheat.png" />
+            <Pattern id="sheep" link="/assets/sheep.png" />
+            <Pattern id="brick" link="/assets/brick.png" />
+            <Pattern id="desert" link="/assets/desert.png" />
+            <Pattern
+              id="any-top-left"
+              link="https://i.ibb.co/VNGt99L/any-bottom-left.png"
+            />
+            <Pattern
+              id="any-bottom-left"
+              link="https://i.ibb.co/MND5qK0/any-bottom-right.png"
+            />
+            <Pattern id="any-left" link="https://i.ibb.co/FbDryXJ/any-down.png" />
+          </Layout>
+        </HexGrid>
+      </div>
       <IconButton size="large" id="button-top-left" onClick={shuffleBoard}>
-        <ShuffleIcon style={{color: "white"}} fontSize="large"/>
+        <ShuffleIcon style={{ color: "white" }} fontSize="large" />
       </IconButton>
       <IconButton size="large" id="button-top-right" onClick={shuffleBoard}>
-        <ShuffleIcon style={{color: "white"}} fontSize="large"/>
+        <ShuffleIcon style={{ color: "white" }} fontSize="large" />
       </IconButton>
       <IconButton size="large" id="button-bottom-left" onClick={shuffleBoard}>
-        <ShuffleIcon style={{color: "white"}} fontSize="large"/>
+        <ShuffleIcon style={{ color: "white" }} fontSize="large" />
       </IconButton>
       <IconButton size="large" id="button-bottom-right" onClick={shuffleBoard}>
-        <ShuffleIcon style={{color: "white"}} fontSize="large"/>
+        <ShuffleIcon style={{ color: "white" }} fontSize="large" />
       </IconButton>
     </div>
   );

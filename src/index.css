@@ -40,3 +40,9 @@ code {
   left: 200px;
   bottom: 100px;
 }
+
+.hexgrid-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
