@@ -5,6 +5,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #006994;
 }
 
 code {
@@ -15,3 +16,27 @@ code {
 .hexgrid-container {
   transform: rotate(90deg);
 } */
+
+#button-top-left {
+  position: absolute;
+  left: 200px;
+  top: 100px;
+}
+
+#button-top-right {
+  position: absolute;
+  right: 200px;
+  top: 100px;
+}
+
+#button-bottom-right {
+  position: absolute;
+  right: 200px;
+  bottom: 100px;
+}
+
+#button-bottom-left {
+  position: absolute;
+  left: 200px;
+  bottom: 100px;
+}

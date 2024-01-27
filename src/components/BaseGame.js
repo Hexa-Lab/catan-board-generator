@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { HexGrid, Layout, Pattern, Hexagon, Text } from "react-hexgrid";
+import {IconButton} from '@mui/material'
+import ShuffleIcon from '@mui/icons-material/Shuffle';
+
 
 const BaseGame = () => {
   const [boardLayout, setBoardLayout] = useState([
@@ -383,7 +386,7 @@ const BaseGame = () => {
   }
 
   return (
-    <div className="hexgrid-container">
+    <div>
       <HexGrid width={900} height={900} viewBox="-50 -50 100 100">
         <Layout
           size={{ x: 10, y: 10 }}
@@ -433,7 +436,18 @@ const BaseGame = () => {
           <Pattern id="any-left" link="https://i.ibb.co/FbDryXJ/any-down.png" />
         </Layout>
       </HexGrid>
-      <button onClick={shuffleBoard}>Shuffle Board</button>
+      <IconButton size="large" id="button-top-left" onClick={shuffleBoard}>
+        <ShuffleIcon style={{color: "white"}} fontSize="large"/>
+      </IconButton>
+      <IconButton size="large" id="button-top-right" onClick={shuffleBoard}>
+        <ShuffleIcon style={{color: "white"}} fontSize="large"/>
+      </IconButton>
+      <IconButton size="large" id="button-bottom-left" onClick={shuffleBoard}>
+        <ShuffleIcon style={{color: "white"}} fontSize="large"/>
+      </IconButton>
+      <IconButton size="large" id="button-bottom-right" onClick={shuffleBoard}>
+        <ShuffleIcon style={{color: "white"}} fontSize="large"/>
+      </IconButton>
     </div>
   );
 };
