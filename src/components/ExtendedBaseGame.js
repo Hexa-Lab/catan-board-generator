@@ -2,11 +2,11 @@ import React, { useState, useEffect } from "react";
 import { HexGrid, Layout, Pattern, Hexagon, Text } from "react-hexgrid";
 import NumberBackground from './NumberBackground';
 import Tile from './Tile';
-import { DefaultGameBoard } from '../utils/constants';
+import { ExtendedBaseGameBoard } from '../utils/constants';
 
-const BaseGame = () => {
+const ExtendedBaseGame = () => {
   const [prevBoardLayout, setPrevBoardLayout] = useState([]);
-  const [boardLayout, setBoardLayout] = useState(DefaultGameBoard);
+  const [boardLayout, setBoardLayout] = useState(ExtendedBaseGameBoard);
 
   useEffect(() => {
     shuffleBoard();
@@ -15,7 +15,7 @@ const BaseGame = () => {
   useEffect(() => {
     function handleKeyDown(e) {
       e.preventDefault();
-      if (e.keyCode === 49) {
+      if (e.keyCode === 50) {
         shuffleBoard();
       }
 
@@ -61,17 +61,17 @@ const BaseGame = () => {
     }
 
     return (
-      pipCounts.forest >= 12 &&
-      pipCounts.forest <= 15 &&
-      pipCounts.brick >= 9 &&
-      pipCounts.brick <= 12 &&
-      pipCounts.sheep >= 12 &&
-      pipCounts.sheep <= 15 &&
-      pipCounts.wheat >= 12 &&
-      pipCounts.wheat <= 15 &&
-      pipCounts.ore >= 9 &&
-      pipCounts.ore <= 12
-    );
+        pipCounts.forest >= 16 &&
+        pipCounts.forest <= 20 &&
+        pipCounts.brick >= 14 &&
+        pipCounts.brick <= 18 &&
+        pipCounts.sheep >= 16 &&
+        pipCounts.sheep <= 20 &&
+        pipCounts.wheat >= 16 &&
+        pipCounts.wheat <= 20 &&
+        pipCounts.ore >= 14 &&
+        pipCounts.ore <= 18
+      );
   }
 
   function shuffleArray(array) {
@@ -90,14 +90,12 @@ const BaseGame = () => {
   }
 
   function placeSixesAndEights() {
-    let sixesAndEights = [6, 6, 8, 8];
+    let sixesAndEights = [6, 6, 6, 8, 8, 8];
     shuffleArray(sixesAndEights);
-
-    let resourceSixOrEight = { forest: false, brick: false, sheep: false, wheat: false, ore: false };
 
     // Create an array of indices for hexagons that are not desert
     let nonDesertIndices = boardLayout
-      .map((hex, index) => hex.fill !== "desert" ? index : -1)
+      .map((hex, index) => hex.fill !== 'desert' ? index : -1)
       .filter(index => index !== -1);
 
     for (let number of sixesAndEights) {
@@ -106,10 +104,9 @@ const BaseGame = () => {
 
       for (let index of nonDesertIndices) {
         let hex = boardLayout[index];
-        if (hex.number === null && !isNeighborWithSixOrEight(hex.id) && !resourceSixOrEight[hex.fill]) {
+        if (hex.number === null && !isNeighborWithSixOrEight(hex.id)) {
           hex.number = number;
           placed = true;
-          resourceSixOrEight[hex.fill] = true; // Mark this resource as having a 6 or 8
           break;
         }
       }
@@ -149,7 +146,7 @@ const BaseGame = () => {
 
   function checkFillValidity() {
     for (const hex of boardLayout) {
-      if (hex.fill === "desert" || hex.fill === "any-top-left") continue;
+      if (hex.fill === "desert") continue;
       let sameTypeCount = 0;
 
       for (const neighborId of hex.neighbors) {
@@ -172,7 +169,7 @@ const BaseGame = () => {
   }
 
   function fillInOtherNumbers() {
-    let otherNumbers = [2, 3, 3, 4, 4, 5, 5, 9, 9, 10, 10, 11, 11, 12];
+    let otherNumbers = [2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 9, 9, 9, 10, 10, 10, 11, 11, 11, 12, 12];
     shuffleArray(otherNumbers);
 
     for (const hex of boardLayout) {
@@ -207,7 +204,7 @@ const BaseGame = () => {
       attempts++;
       // Reset numbers
       boardLayout.forEach(
-        (hex) => (hex.number = (hex.fill === "desert" || hex.fill === "any-top-left") ? null : undefined)
+        (hex) => (hex.number = (hex.fill === "desert") ? null : undefined)
       );
 
       placeSixesAndEights();
@@ -217,9 +214,9 @@ const BaseGame = () => {
       if (success) {
         success = isValidPipDistribution();
       }
-    } while (!success && attempts < 100);
+    } while (!success && attempts < 500);
 
-    if (attempts >= 100 || !success) {
+    if (attempts >= 500 || !success) {
       console.log(`Failed to find a valid distribution after ${attempts} attempts`);
     }
   }
@@ -269,15 +266,6 @@ const BaseGame = () => {
                 <Pattern id="sheep" link="/assets/sheep.png" />
                 <Pattern id="brick" link="/assets/brick.png" />
                 <Pattern id="desert" link="/assets/desert.png" />
-                <Pattern
-                  id="any-top-left"
-                  link="https://i.ibb.co/VNGt99L/any-bottom-left.png"
-                />
-                <Pattern
-                  id="any-bottom-left"
-                  link="https://i.ibb.co/MND5qK0/any-bottom-right.png"
-                />
-                <Pattern id="any-left" link="https://i.ibb.co/FbDryXJ/any-down.png" />
               </Layout>
             </HexGrid>
           </div>
@@ -287,4 +275,4 @@ const BaseGame = () => {
   );
 };
 
-export default BaseGame;
+export default ExtendedBaseGame;
