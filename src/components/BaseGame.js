@@ -4,9 +4,10 @@ import NumberBackground from './NumberBackground';
 import Tile from './Tile';
 import { DefaultGameBoard } from '../utils/constants';
 
-const BaseGame = () => {
+const BaseGame = (props) => {
   const [prevBoardLayout, setPrevBoardLayout] = useState([]);
   const [boardLayout, setBoardLayout] = useState(DefaultGameBoard);
+  const {twoTwelve} = props
 
   useEffect(() => {
     shuffleBoard();
@@ -258,7 +259,7 @@ const BaseGame = () => {
                     {hex.number && (
                       <>
                         <NumberBackground />
-                        <Tile hex={hex} />
+                        <Tile hex={hex} twoTwelve={twoTwelve} />
                       </>
                     )}
                   </Hexagon>

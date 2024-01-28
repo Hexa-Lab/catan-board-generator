@@ -1,6 +1,6 @@
 import { Text } from "react-hexgrid";
 
-const Tile = ({hex}) => {
+const Tile = ({hex, twoTwelve}) => {
     const calculatePips = (number) => {
         switch (number) {
             case 2:
@@ -44,6 +44,7 @@ const Tile = ({hex}) => {
     const pips = calculatePips(hex.number);
 
     const renderPips = () => {
+        console.log(`twoTwelve = ${twoTwelve}`)
         let pipElements = [];
         for (let i = 0; i < pips.numOfPips; i++) {
             
@@ -65,12 +66,12 @@ const Tile = ({hex}) => {
         <g>
             <Text
                 fontFamily="Sriracha"
-                fontSize={3.5}
+                fontSize={(twoTwelve && (hex.number === 12 || hex.number === 2)) ? 2.5 : 3.5}
                 stroke="none"
                 fill={hex.number === 8 || hex.number === 6 ? "#8b0000" : "black"}
                 style={{ transform: "rotate(270deg)" }}
             >
-                {hex.number}
+                {(twoTwelve && (hex.number === 12 || hex.number === 2)) ? "2/12" : hex.number}
             </Text>
             {renderPips()}
         </g>

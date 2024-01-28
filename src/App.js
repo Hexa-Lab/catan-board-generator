@@ -5,6 +5,7 @@ import ExtendedBaseGame from './components/ExtendedBaseGame';
 
 function App() {
   const [gameMode, setGameMode] = useState('extendedBase');
+  const [twoTwelve, setTwoTwelve] = useState(false);
 
   useEffect(() => {
     function handleKeyDown(e) {
@@ -16,17 +17,21 @@ function App() {
       if (e.keyCode === 50) {
         setGameMode('extendedBase');
       }
+
+      if (e.keyCode === 84) {
+        setTwoTwelve(!twoTwelve);
+      }
     }
 
     document.addEventListener('keydown', handleKeyDown, false);
 
     return () => document.removeEventListener('keydown', handleKeyDown, false);
-  }, []);
+  }, [twoTwelve]);
 
   return (
       <div className="App">
-        {gameMode === 'base' && <BaseGame />}
-        {gameMode === 'extendedBase' && <ExtendedBaseGame />}
+        {gameMode === 'base' && <BaseGame twoTwelve={twoTwelve}/>}
+        {gameMode === 'extendedBase' && <ExtendedBaseGame twoTwelve={twoTwelve}/>}
       </div>
   );
 }
