@@ -255,7 +255,7 @@ const ExtendedBaseGame = (props) => {
                   <Hexagon
                     key={index}
                     q={hex.q}
-                    r={hex.r}
+                    r={hex.r -0.5}
                     s={hex.s}
                     stroke="#006994"
                     strokeWidth={0.3}
