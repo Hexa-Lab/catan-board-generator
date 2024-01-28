@@ -576,3 +576,135 @@ export const ExtendedBaseGameBoard = [
     neighbors: [24, 25, 28]
   },
 ]
+
+export const ExtendedBaseGameBridges = [
+  {
+    q: 0,
+    r: -3,
+    s: 0,
+    fill: "bridges-left",
+    id: 0,
+  },
+  {
+    q: -2,
+    r: -1,
+    s: 3,
+    fill: "bridges-bottom-left",
+    id: 0,
+  },
+  {
+    q: -3,
+    r: 1,
+    s: 1,
+    fill: "bridges-bottom-left",
+    id: 0,
+  },
+  {
+    q: -3,
+    r: 3,
+    s: 1,
+    fill: "bridges-bottom-right",
+    id: 0,
+  },
+  {
+    q: -1,
+    r: 3,
+    s: 1,
+    fill: "bridges-right",
+    id: 0,
+  },
+  {
+    q: 1,
+    r: 2,
+    s: 3,
+    fill: "bridges-right",
+    id: 0,
+  },
+  {
+    q: 3,
+    r: 0,
+    s: 3,
+    fill: "bridges-top-right",
+    id: 0,
+  },
+  {
+    q: 3,
+    r: -2,
+    s: 3,
+    fill: "bridges-top-left",
+    id: 0,
+  },
+  {
+    q: 2,
+    r: -3,
+    s: 3,
+    fill: "bridges-top-left",
+    id: 0,
+  },
+];
+
+export const ExtendedBaseGamePorts = [
+  {
+    q: 0,
+    r: -3,
+    s: 0,
+    fill: "any",
+    id: 0,
+  },
+  {
+    q: -2,
+    r: -1,
+    s: 3,
+    fill: "any",
+    id: 0,
+  },
+  {
+    q: -3,
+    r: 1,
+    s: 1,
+    fill: "any",
+    id: 0,
+  },
+  {
+    q: -3,
+    r: 3,
+    s: 1,
+    fill: "any",
+    id: 0,
+  },
+  {
+    q: -1,
+    r: 3,
+    s: 1,
+    fill: "wood-port",
+    id: 0,
+  },
+  {
+    q: 1,
+    r: 2,
+    s: 3,
+    fill: "brick-port",
+    id: 0,
+  },
+  {
+    q: 3,
+    r: 0,
+    s: 3,
+    fill: "sheep-port",
+    id: 0,
+  },
+  {
+    q: 3,
+    r: -2,
+    s: 3,
+    fill: "wheat-port",
+    id: 0,
+  },
+  {
+    q: 2,
+    r: -3,
+    s: 3,
+    fill: "ore-port",
+    id: 0,
+  },
+];
