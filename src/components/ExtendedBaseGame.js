@@ -92,26 +92,33 @@ const ExtendedBaseGame = () => {
   function placeSixesAndEights() {
     let sixesAndEights = [6, 6, 6, 8, 8, 8];
     shuffleArray(sixesAndEights);
-
-    // Create an array of indices for hexagons that are not desert
-    let nonDesertIndices = boardLayout
-      .map((hex, index) => hex.fill !== 'desert' ? index : -1)
-      .filter(index => index !== -1);
-
+  
+    // Initialize a count for 6s and 8s for each resource type
+    const resourceCounts = { forest: 0, brick: 0, sheep: 0, wheat: 0, ore: 0 };
+  
+    // Helper function to check if a resource type can receive another 6 or 8
+    const canPlaceNumber = (resource, number) => {
+      const counts = Object.values(resourceCounts);
+      const minCount = Math.min(...counts);
+      return resourceCounts[resource] === minCount || (number === 8 && resourceCounts[resource] === minCount + 1);
+    };
+  
     for (let number of sixesAndEights) {
-      shuffleArray(nonDesertIndices);
+      let nonDesertHexes = boardLayout.filter(hex => hex.fill !== 'desert' && hex.number === null && !isNeighborWithSixOrEight(hex.id));
+      shuffleArray(nonDesertHexes);
+  
       let placed = false;
-
-      for (let index of nonDesertIndices) {
-        let hex = boardLayout[index];
-        if (hex.number === null && !isNeighborWithSixOrEight(hex.id)) {
+      for (let hex of nonDesertHexes) {
+        if (canPlaceNumber(hex.fill, number)) {
           hex.number = number;
+          resourceCounts[hex.fill]++;
           placed = true;
           break;
         }
       }
-
+  
       if (!placed) {
+        // Reset and retry if unable to place number with proper distribution
         boardLayout.forEach(hex => {
           if (hex.fill !== "desert") hex.number = null;
         });
@@ -120,6 +127,7 @@ const ExtendedBaseGame = () => {
       }
     }
   }
+  
 
   function shuffleFills() {
     let validFills = false;
