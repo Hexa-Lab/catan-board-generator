@@ -7,8 +7,8 @@ import { Hexes, Bridges, Ports } from './constants';
 const ExtendedBaseGame = (props) => {
   const [prevBoardLayout, setPrevBoardLayout] = useState([]);
   const [boardLayout, setBoardLayout] = useState(Hexes);
-  const [bridges, setBridges] = useState(Bridges)
-  const [ports, setPorts] = useState(Ports)
+  const [bridges,] = useState(Bridges)
+  const [ports,] = useState(Ports)
   const {twoTwelve} = props
 
   useEffect(() => {
