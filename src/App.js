@@ -4,7 +4,7 @@ import BaseGame from './components/BaseGame';
 import ExtendedBaseGame from './components/ExtendedBaseGame';
 
 function App() {
-  const [gameMode, setGameMode] = useState('extendedBase');
+  const [gameMode, setGameMode] = useState('base');
   const [twoTwelve, setTwoTwelve] = useState(false);
 
   useEffect(() => {

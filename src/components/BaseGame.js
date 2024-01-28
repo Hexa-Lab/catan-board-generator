@@ -2,11 +2,13 @@ import React, { useState, useEffect } from "react";
 import { HexGrid, Layout, Pattern, Hexagon, Text } from "react-hexgrid";
 import NumberBackground from './NumberBackground';
 import Tile from './Tile';
-import { DefaultGameBoard } from '../utils/constants';
+import { DefaultBridges, DefaultGameBoard, DefaultPorts } from '../utils/constants';
 
 const BaseGame = (props) => {
   const [prevBoardLayout, setPrevBoardLayout] = useState([]);
   const [boardLayout, setBoardLayout] = useState(DefaultGameBoard);
+  const [bridges, setBridges] = useState(DefaultBridges)
+  const [ports, setPorts] = useState(DefaultPorts)
   const {twoTwelve} = props
 
   useEffect(() => {
@@ -148,6 +150,15 @@ const BaseGame = (props) => {
     }
   }
 
+  function shufflePorts() {
+      // Shuffle 'fill' attributes including the desert
+      const fills = ports.map(port => port.fill);
+      shuffleArray(fills);
+      for (let i = 0; i < ports.length; i++) {
+        ports[i].fill = fills[i];
+      }
+  }
+
   function checkFillValidity() {
     for (const hex of boardLayout) {
       if (hex.fill === "desert" || hex.fill === "any-top-left") continue;
@@ -229,6 +240,7 @@ const BaseGame = (props) => {
     setPrevBoardLayout([...boardLayout]);
     shuffleFills();
     shuffleNumbers();
+    shufflePorts();
     // Update the state to trigger re-render
     setBoardLayout([...boardLayout]);
   }
@@ -270,15 +282,62 @@ const BaseGame = (props) => {
                 <Pattern id="sheep" link="/assets/sheep.png" />
                 <Pattern id="brick" link="/assets/brick.png" />
                 <Pattern id="desert" link="/assets/desert.png" />
-                <Pattern
-                  id="any-top-left"
-                  link="https://i.ibb.co/VNGt99L/any-bottom-left.png"
-                />
-                <Pattern
-                  id="any-bottom-left"
-                  link="https://i.ibb.co/MND5qK0/any-bottom-right.png"
-                />
-                <Pattern id="any-left" link="https://i.ibb.co/FbDryXJ/any-down.png" />
+              </Layout>
+            </HexGrid>
+          </div>
+          <div className="bridges" style={{position: "absolute", zIndex: 1}}>
+          <HexGrid width={1000} height={1000} viewBox="-60 -60 120 120"
+              style={{ transform: "rotate(90deg)" }}>
+              <Layout
+                size={{ x: 10, y: 10 }}
+                flat={true}
+                spacing={1}
+                origin={{ x: 0, y: 0 }}
+              >
+                {bridges.map((bridge, index) => (
+                  <Hexagon
+                    key={index}
+                    q={bridge.q}
+                    r={bridge.r}
+                    s={bridge.s}
+                    fill={bridge.fill}
+                  >
+                  </Hexagon>
+                ))}
+                <Pattern id="bridges-top-left" link="/assets/bridges-bottom-left.png" />
+                <Pattern id="bridges-top-right" link="/assets/bridges-top-left.png" />
+                <Pattern id="bridges-left" link="/assets/bridges-bottom.png" />
+                <Pattern id="bridges-right" link="/assets/bridges-top.png" />
+                <Pattern id="bridges-bottom-left" link="/assets/bridges-bottom-right.png" />
+                <Pattern id="bridges-bottom-right" link="/assets/bridges-top-right.png" />
+              </Layout>
+            </HexGrid>
+          </div>
+          <div className="ports" style={{position: "absolute", zIndex: 1}}>
+          <HexGrid width={1000} height={1000} viewBox="-60 -60 120 120"
+              style={{ transform: "rotate(90deg)" }}>
+              <Layout
+                size={{ x: 10, y: 10 }}
+                flat={true}
+                spacing={1}
+                origin={{ x: 0, y: 0 }}
+              >
+                {ports.map((port, index) => (
+                  <Hexagon
+                    key={index}
+                    q={port.q}
+                    r={port.r}
+                    s={port.s}
+                    fill={port.fill}
+                  >
+                  </Hexagon>
+                ))}
+                <Pattern id="any" link="/assets/any.png" />
+                <Pattern id="ore-port" link="/assets/ore-port.png" />
+                <Pattern id="wheat-port" link="/assets/wheat-port.png" />
+                <Pattern id="sheep-port" link="/assets/sheep-port.png" />
+                <Pattern id="brick-port" link="/assets/brick-port.png" />
+                <Pattern id="wood-port" link="/assets/wood-port.png" />
               </Layout>
             </HexGrid>
           </div>
