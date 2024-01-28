@@ -240,10 +240,20 @@ const ExtendedBaseGame = (props) => {
     }
   }
 
+  function shufflePorts() {
+      // Shuffle 'fill' attributes including the desert
+      const fills = ports.map(port => port.fill);
+      shuffleArray(fills);
+      for (let i = 0; i < ports.length; i++) {
+        ports[i].fill = fills[i];
+      }
+  }
+
   function shuffleBoard() {
     setPrevBoardLayout([...boardLayout]);
     shuffleFills();
     shuffleNumbers();
+    shufflePorts();
     // Update the state to trigger re-render
     setBoardLayout([...boardLayout]);
   }
