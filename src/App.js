@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
-import BaseGame from './components/BaseGame';
-import ExtendedBaseGame from './components/ExtendedBaseGame';
+import BaseGame from './modes/base/game';
+import ExtendedBaseGame from './modes/extended-base/game';
 
 function App() {
   const [gameMode, setGameMode] = useState('base');

@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { HexGrid, Layout, Pattern, Hexagon, Text } from "react-hexgrid";
-import NumberBackground from './NumberBackground';
-import Tile from './Tile';
-import { ExtendedBaseGameBoard, ExtendedBaseGameBridges, ExtendedBaseGamePorts } from '../utils/constants';
+import { HexGrid, Layout, Pattern, Hexagon } from "react-hexgrid";
+import NumberTileBackground from '../../components/NumberTileBackground';
+import Tile from '../../components/Tile';
+import { Hexes, Bridges, Ports } from './constants';
 
 const ExtendedBaseGame = (props) => {
   const [prevBoardLayout, setPrevBoardLayout] = useState([]);
-  const [boardLayout, setBoardLayout] = useState(ExtendedBaseGameBoard);
-  const [bridges, setBridges] = useState(ExtendedBaseGameBridges)
-  const [ports, setPorts] = useState(ExtendedBaseGamePorts)
+  const [boardLayout, setBoardLayout] = useState(Hexes);
+  const [bridges, setBridges] = useState(Bridges)
+  const [ports, setPorts] = useState(Ports)
   const {twoTwelve} = props
 
   useEffect(() => {
@@ -155,6 +155,14 @@ const ExtendedBaseGame = (props) => {
     }
   }
 
+  function shufflePorts() {
+    const fills = ports.map(port => port.fill);
+    shuffleArray(fills);
+    for (let i = 0; i < ports.length; i++) {
+      ports[i].fill = fills[i];
+    }
+  }
+
   function checkFillValidity() {
     for (const hex of boardLayout) {
       if (hex.fill === "desert") continue;
@@ -255,7 +263,7 @@ const ExtendedBaseGame = (props) => {
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh" }}>
         <div className="hexgrid-container">
           <div className="board" style={{zIndex: -1, position: "absolute"}}>
-            <HexGrid width={1000} height={1000} viewBox="-65 -65 130 130"
+            <HexGrid width={1000} height={1000} viewBox="-70 -70 140 140"
               style={{ transform: "rotate(90deg)" }}>
               <Layout
                 size={{ x: 10, y: 10 }}
@@ -275,7 +283,7 @@ const ExtendedBaseGame = (props) => {
                   >
                     {hex.number && (
                       <>
-                        <NumberBackground />
+                        <NumberTileBackground />
                         <Tile hex={hex} twoTwelve={twoTwelve} />
                       </>
                     )}
@@ -290,8 +298,9 @@ const ExtendedBaseGame = (props) => {
               </Layout>
             </HexGrid>
           </div>
-          <div className="bridges" style={{position: "absolute", zIndex: 1}}>
-          <HexGrid width={1000} height={1000} viewBox="-65 -65 130 130"
+        </div>
+        <div className="bridges" style={{position: "absolute", zIndex: 1}}>
+          <HexGrid width={1000} height={1000} viewBox="-70 -70 140 140"
               style={{ transform: "rotate(90deg)" }}>
               <Layout
                 size={{ x: 10, y: 10 }}
@@ -303,7 +312,7 @@ const ExtendedBaseGame = (props) => {
                   <Hexagon
                     key={index}
                     q={bridge.q}
-                    r={bridge.r -0.5}
+                    r={bridge.r}
                     s={bridge.s}
                     fill={bridge.fill}
                   >
@@ -319,7 +328,7 @@ const ExtendedBaseGame = (props) => {
             </HexGrid>
           </div>
           <div className="ports" style={{position: "absolute", zIndex: 1}}>
-          <HexGrid width={1000} height={1000} viewBox="-65 -65 130 130"
+            <HexGrid width={1000} height={1000} viewBox="-70 -70 140 140"
               style={{ transform: "rotate(90deg)" }}>
               <Layout
                 size={{ x: 10, y: 10 }}
@@ -331,7 +340,7 @@ const ExtendedBaseGame = (props) => {
                   <Hexagon
                     key={index}
                     q={port.q}
-                    r={port.r - 0.5}
+                    r={port.r}
                     s={port.s}
                     fill={port.fill}
                   >
@@ -346,7 +355,6 @@ const ExtendedBaseGame = (props) => {
               </Layout>
             </HexGrid>
           </div>
-        </div>
       </div>
     </>
   );

@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { HexGrid, Layout, Pattern, Hexagon, Text } from "react-hexgrid";
-import NumberBackground from './NumberBackground';
-import Tile from './Tile';
-import { DefaultBridges, DefaultGameBoard, DefaultPorts } from '../utils/constants';
+import { HexGrid, Layout, Pattern, Hexagon } from "react-hexgrid";
+import NumberTileBackground from '../../components/NumberTileBackground';
+import Tile from '../../components/Tile';
+import { Hexes, Bridges, Ports } from './constants'
 
 const BaseGame = (props) => {
   const [prevBoardLayout, setPrevBoardLayout] = useState([]);
-  const [boardLayout, setBoardLayout] = useState(DefaultGameBoard);
-  const [bridges, setBridges] = useState(DefaultBridges)
-  const [ports, setPorts] = useState(DefaultPorts)
+  const [boardLayout, setBoardLayout] = useState(Hexes);
+  const [bridges, setBridges] = useState(Bridges)
+  const [ports, setPorts] = useState(Ports)
   const {twoTwelve} = props
 
   useEffect(() => {
@@ -270,7 +270,7 @@ const BaseGame = (props) => {
                   >
                     {hex.number && (
                       <>
-                        <NumberBackground />
+                        <NumberTileBackground />
                         <Tile hex={hex} twoTwelve={twoTwelve} />
                       </>
                     )}
@@ -314,7 +314,7 @@ const BaseGame = (props) => {
             </HexGrid>
           </div>
           <div className="ports" style={{position: "absolute", zIndex: 1}}>
-          <HexGrid width={1000} height={1000} viewBox="-60 -60 120 120"
+            <HexGrid width={1000} height={1000} viewBox="-60 -60 120 120"
               style={{ transform: "rotate(90deg)" }}>
               <Layout
                 size={{ x: 10, y: 10 }}
