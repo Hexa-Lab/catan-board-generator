@@ -44,7 +44,6 @@ const Tile = ({hex, twoTwelve}) => {
     const pips = calculatePips(hex.number);
 
     const renderPips = () => {
-        console.log(`twoTwelve = ${twoTwelve}`)
         let pipElements = [];
         for (let i = 0; i < pips.numOfPips; i++) {
             

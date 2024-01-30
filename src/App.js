@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import BaseGame from './modes/base/game';
 import ExtendedBaseGame from './modes/extended-base/game';
+import FourIslands from './modes/four-islands/game';
 
 function App() {
   const [gameMode, setGameMode] = useState('base');
@@ -18,6 +19,10 @@ function App() {
         setGameMode('extendedBase');
       }
 
+      if (e.keyCode === 51) {
+        setGameMode('fourIslands')
+      }
+
       if (e.keyCode === 84) {
         setTwoTwelve(!twoTwelve);
       }
@@ -32,6 +37,7 @@ function App() {
       <div className="App">
         {gameMode === 'base' && <BaseGame twoTwelve={twoTwelve}/>}
         {gameMode === 'extendedBase' && <ExtendedBaseGame twoTwelve={twoTwelve}/>}
+        {gameMode === 'fourIslands' && <FourIslands twoTwelve={twoTwelve}/>}
       </div>
   );
 }
