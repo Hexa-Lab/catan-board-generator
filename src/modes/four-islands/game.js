@@ -283,8 +283,9 @@ const FourIslands = (props) => {
                     q={hex.q - 1}
                     r={hex.r + 0.5}
                     s={hex.s}
-                    stroke="#006994"
-                    strokeWidth={0.3}
+                    stroke="black"
+                    strokeWidth={0.2}
+                    strokeOpacity={.7}
                     fill={hex.fill}
                   >
                     {hex.number && (

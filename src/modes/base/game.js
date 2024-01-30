@@ -264,8 +264,9 @@ const BaseGame = (props) => {
                     q={hex.q}
                     r={hex.r}
                     s={hex.s}
-                    stroke="#006994"
-                    strokeWidth={0.3}
+                    stroke="black"
+                    strokeWidth={0.2}
+                    strokeOpacity={.7}
                     fill={hex.fill}
                   >
                     {hex.number && (
