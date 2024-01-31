@@ -298,6 +298,7 @@ const FourIslands = (props) => {
                 <Pattern id="sheep" link="/assets/images/hexes/sheep.png" />
                 <Pattern id="brick" link="/assets/images/hexes/brick.png" />
                 <Pattern id="desert" link="/assets/images/hexes/desert.png" />
+                <Pattern id="ocean" link="/assets/images/hexes/ocean.png" />
               </Layout>
             </HexGrid>
           </div>
