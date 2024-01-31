@@ -5,7 +5,6 @@ import Tile from '../../components/Tile';
 import { Hexes, Bridges, Ports } from './constants';
 
 const ExtendedBaseGame = (props) => {
-  const [prevBoardLayout, setPrevBoardLayout] = useState([]);
   const [boardLayout, setBoardLayout] = useState(Hexes);
   const [bridges,] = useState(Bridges)
   const [ports,] = useState(Ports)
@@ -20,10 +19,6 @@ const ExtendedBaseGame = (props) => {
       e.preventDefault();
       if (e.keyCode === 50) {
         shuffleBoard();
-      }
-
-      if (e.keyCode === 187) {
-        setBoardLayout([...prevBoardLayout]);
       }
     }
 
@@ -250,7 +245,6 @@ const ExtendedBaseGame = (props) => {
   }
 
   function shuffleBoard() {
-    setPrevBoardLayout([...boardLayout]);
     shuffleFills();
     shuffleNumbers();
     shufflePorts();

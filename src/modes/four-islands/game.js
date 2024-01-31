@@ -5,7 +5,6 @@ import Tile from '../../components/Tile';
 import { Hexes, Bridges, Ports } from './constants';
 
 const FourIslands = (props) => {
-  const [prevBoardLayout, setPrevBoardLayout] = useState([]);
   const [boardLayout, setBoardLayout] = useState(Hexes);
   const [bridges,] = useState(Bridges)
   const [ports,] = useState(Ports)
@@ -20,10 +19,6 @@ const FourIslands = (props) => {
       e.preventDefault();
       if (e.keyCode === 51) {
         shuffleBoard();
-      }
-
-      if (e.keyCode === 187) {
-        setBoardLayout([...prevBoardLayout]);
       }
     }
 
@@ -256,7 +251,6 @@ const FourIslands = (props) => {
   }
 
   function shuffleBoard() {
-    setPrevBoardLayout([...boardLayout]);
     shuffleFills();
     shuffleNumbers();
     shufflePorts();
