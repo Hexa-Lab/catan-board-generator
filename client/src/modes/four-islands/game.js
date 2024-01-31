@@ -4,7 +4,7 @@ import NumberTileBackground from '../../components/NumberTileBackground';
 import Tile from '../../components/Tile';
 import { Hexes, Bridges, Ports } from './constants';
 
-const ExtendedBaseGame = (props) => {
+const FourIslands = (props) => {
   const [boardLayout, setBoardLayout] = useState(Hexes);
   const [bridges,] = useState(Bridges)
   const [ports,] = useState(Ports)
@@ -17,7 +17,9 @@ const ExtendedBaseGame = (props) => {
   useEffect(() => {
     function handleKeyDown(e) {
       e.preventDefault();
-      if (e.keyCode === 50) {
+
+      // Key: 3
+      if (e.keyCode === 51) {
         shuffleBoard();
       }
     }
@@ -59,16 +61,16 @@ const ExtendedBaseGame = (props) => {
     }
 
     return (
-        pipCounts.forest >= 16 &&
-        pipCounts.forest <= 20 &&
-        pipCounts.brick >= 14 &&
-        pipCounts.brick <= 18 &&
-        pipCounts.sheep >= 16 &&
-        pipCounts.sheep <= 20 &&
-        pipCounts.wheat >= 16 &&
-        pipCounts.wheat <= 20 &&
-        pipCounts.ore >= 14 &&
-        pipCounts.ore <= 18
+        pipCounts.forest >= 10 &&
+        pipCounts.forest <= 15 &&
+        pipCounts.brick >= 7 &&
+        pipCounts.brick <= 12 &&
+        pipCounts.sheep >= 10 &&
+        pipCounts.sheep <= 15 &&
+        pipCounts.wheat >= 10 &&
+        pipCounts.wheat <= 15 &&
+        pipCounts.ore >= 7 &&
+        pipCounts.ore <= 12
       );
   }
 
@@ -88,7 +90,7 @@ const ExtendedBaseGame = (props) => {
   }
 
   function placeSixesAndEights() {
-    let sixesAndEights = [6, 6, 6, 8, 8, 8];
+    let sixesAndEights = [6, 6, 8, 8];
     shuffleArray(sixesAndEights);
   
     // Initialize a count for 6s and 8s for each resource type
@@ -134,7 +136,13 @@ const ExtendedBaseGame = (props) => {
     while (!validFills && attempts < 1000) {
       // Shuffle 'fill' attributes including the desert
       const fills = boardLayout.map(hex => hex.fill);
-      shuffleArray(fills);
+      for (let i = fills.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        if (fills[i] === 'ocean' || fills[j] === 'ocean') {
+            continue;
+        }
+        [fills[i], fills[j]] = [fills[j], fills[i]];
+      }
       for (let i = 0; i < boardLayout.length; i++) {
         boardLayout[i].fill = fills[i];
       }
@@ -183,11 +191,11 @@ const ExtendedBaseGame = (props) => {
   }
 
   function fillInOtherNumbers() {
-    let otherNumbers = [2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 9, 9, 9, 10, 10, 10, 11, 11, 11, 12, 12];
+    let otherNumbers = [2, 3, 3, 4, 4, 4, 5, 5, 9, 9, 9, 10, 10, 10, 11, 11, 12];
     shuffleArray(otherNumbers);
 
     for (const hex of boardLayout) {
-      if (hex.fill === "desert" || hex.number !== null) continue;
+      if (hex.fill === "desert" || hex.fill === "ocean" || hex.number !== null) continue;
 
       let placed = false;
       for (let i = 0; i < otherNumbers.length; i++) {
@@ -268,8 +276,8 @@ const ExtendedBaseGame = (props) => {
                 {boardLayout.map((hex, index) => (
                   <Hexagon
                     key={index}
-                    q={hex.q}
-                    r={hex.r -0.5}
+                    q={hex.q - 1}
+                    r={hex.r + 0.5}
                     s={hex.s}
                     stroke="black"
                     strokeWidth={0.2}
@@ -284,12 +292,12 @@ const ExtendedBaseGame = (props) => {
                     )}
                   </Hexagon>
                 ))}
-                <Pattern id="forest" link="/assets/wood.png" />
-                <Pattern id="ore" link="/assets/ore.png" />
-                <Pattern id="wheat" link="/assets/wheat.png" />
-                <Pattern id="sheep" link="/assets/sheep.png" />
-                <Pattern id="brick" link="/assets/brick.png" />
-                <Pattern id="desert" link="/assets/desert.png" />
+                <Pattern id="forest" link="/assets/images/hexes/wood.png" />
+                <Pattern id="ore" link="/assets/images/hexes/ore.png" />
+                <Pattern id="wheat" link="/assets/images/hexes/wheat.png" />
+                <Pattern id="sheep" link="/assets/images/hexes/sheep.png" />
+                <Pattern id="brick" link="/assets/images/hexes/brick.png" />
+                <Pattern id="desert" link="/assets/images/hexes/desert.png" />
               </Layout>
             </HexGrid>
           </div>
@@ -306,19 +314,19 @@ const ExtendedBaseGame = (props) => {
                 {bridges.map((bridge, index) => (
                   <Hexagon
                     key={index}
-                    q={bridge.q}
-                    r={bridge.r}
+                    q={bridge.q - 1}
+                    r={bridge.r + 0.5}
                     s={bridge.s}
                     fill={bridge.fill}
                   >
                   </Hexagon>
                 ))}
-                <Pattern id="bridges-top-left" link="/assets/bridges-bottom-left.png" />
-                <Pattern id="bridges-top-right" link="/assets/bridges-top-left.png" />
-                <Pattern id="bridges-left" link="/assets/bridges-bottom.png" />
-                <Pattern id="bridges-right" link="/assets/bridges-top.png" />
-                <Pattern id="bridges-bottom-left" link="/assets/bridges-bottom-right.png" />
-                <Pattern id="bridges-bottom-right" link="/assets/bridges-top-right.png" />
+                <Pattern id="bridges-top-left" link="/assets/images/bridges/bridges-bottom-left.png" />
+                <Pattern id="bridges-top-right" link="/assets/images/bridges/bridges-top-left.png" />
+                <Pattern id="bridges-left" link="/assets/images/bridges/bridges-bottom.png" />
+                <Pattern id="bridges-right" link="/assets/images/bridges/bridges-top.png" />
+                <Pattern id="bridges-bottom-left" link="/assets/images/bridges/bridges-bottom-right.png" />
+                <Pattern id="bridges-bottom-right" link="/assets/images/bridges/bridges-top-right.png" />
               </Layout>
             </HexGrid>
           </div>
@@ -334,19 +342,19 @@ const ExtendedBaseGame = (props) => {
                 {ports.map((port, index) => (
                   <Hexagon
                     key={index}
-                    q={port.q}
-                    r={port.r}
+                    q={port.q - 1}
+                    r={port.r + 0.5}
                     s={port.s}
                     fill={port.fill}
                   >
                   </Hexagon>
                 ))}
-                <Pattern id="any" link="/assets/any.png" />
-                <Pattern id="ore-port" link="/assets/ore-port.png" />
-                <Pattern id="wheat-port" link="/assets/wheat-port.png" />
-                <Pattern id="sheep-port" link="/assets/sheep-port.png" />
-                <Pattern id="brick-port" link="/assets/brick-port.png" />
-                <Pattern id="wood-port" link="/assets/wood-port.png" />
+                <Pattern id="any" link="/assets/images/ports/any-port.png" />
+                <Pattern id="ore-port" link="/assets/images/ports/ore-port.png" />
+                <Pattern id="wheat-port" link="/assets/images/ports/wheat-port.png" />
+                <Pattern id="sheep-port" link="/assets/images/ports/sheep-port.png" />
+                <Pattern id="brick-port" link="/assets/images/ports/brick-port.png" />
+                <Pattern id="wood-port" link="/assets/images/ports/wood-port.png" />
               </Layout>
             </HexGrid>
           </div>
@@ -355,4 +363,4 @@ const ExtendedBaseGame = (props) => {
   );
 };
 
-export default ExtendedBaseGame;
+export default FourIslands;
