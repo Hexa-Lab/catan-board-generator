@@ -13,22 +13,28 @@ function App() {
   useEffect(() => {
     function handleKeyDown(e) {
       e.preventDefault();
+
+      // Key: 1
       if (e.keyCode === 49) {
         setGameMode('base');
       }
 
+      // Key: 2
       if (e.keyCode === 50) {
         setGameMode('extendedBase');
       }
 
+      // Key: 3
       if (e.keyCode === 51) {
         setGameMode('fourIslands')
       }
 
+      // Key: T
       if (e.keyCode === 84) {
         setTwoTwelve(!twoTwelve);
       }
 
+      // Key: V
       if (e.keyCode === 86) {
         setShowBarbarianTracker(!showBarbarianTracker);
       }
