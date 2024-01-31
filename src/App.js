@@ -3,10 +3,12 @@ import './App.css';
 import BaseGame from './modes/base/game';
 import ExtendedBaseGame from './modes/extended-base/game';
 import FourIslands from './modes/four-islands/game';
+import BarbarianTracker from './components/BarbarianTracker';
 
 function App() {
   const [gameMode, setGameMode] = useState('base');
   const [twoTwelve, setTwoTwelve] = useState(false);
+  const [showBarbarianTracker, setShowBarbarianTracker] = useState(false);
 
   useEffect(() => {
     function handleKeyDown(e) {
@@ -26,18 +28,23 @@ function App() {
       if (e.keyCode === 84) {
         setTwoTwelve(!twoTwelve);
       }
+
+      if (e.keyCode === 86) {
+        setShowBarbarianTracker(!showBarbarianTracker);
+      }
     }
 
     document.addEventListener('keydown', handleKeyDown, false);
 
     return () => document.removeEventListener('keydown', handleKeyDown, false);
-  }, [twoTwelve]);
+  }, [twoTwelve, showBarbarianTracker]);
 
   return (
       <div className="App">
         {gameMode === 'base' && <BaseGame twoTwelve={twoTwelve}/>}
         {gameMode === 'extendedBase' && <ExtendedBaseGame twoTwelve={twoTwelve}/>}
         {gameMode === 'fourIslands' && <FourIslands twoTwelve={twoTwelve}/>}
+        {showBarbarianTracker && <BarbarianTracker />}
       </div>
   );
 }

@@ -46,3 +46,58 @@ code {
   align-items: center;
   justify-content: center;
 }
+
+.barbarian-tracker {
+  position: absolute;
+  left: 100px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  width: 160px; /* Adjusted to accommodate the wider zig-zag pattern */
+  height: 400px;
+  background-color: transparent; /* Ocean color */
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.circle {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #f0f0f0;
+  position: absolute; /* Changed to absolute */
+  transition: left 0.3s ease, background-color 0.3s ease;
+}
+
+/* Adjusting positions for zig-zag pattern in groups of three */
+.circle:nth-child(3n+1) {
+  left: 20px; /* Centered within the tracker */
+}
+
+.circle:nth-child(3n+2) {
+  left: 60px; /* Centered within the tracker */
+}
+
+.circle:nth-child(3n+3) {
+  left: 100px; /* Centered within the tracker */
+}
+
+.active {
+  background-color: lightblue; /* Highlight active circle */
+}
+
+.ship {
+  position: absolute;
+  width: 80px;
+  height: 108px;
+  background-image: url('../public/assets/pirate-ship.png');
+  background-size: cover;
+  transition: all 0.3s ease; /* Updated for smooth transition */
+}
+
+#circle-7 {
+  background-color: darkred;
+}
