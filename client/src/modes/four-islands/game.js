@@ -301,7 +301,15 @@ const FourIslands = (props) => {
   const handleSwapNumbers = () => {
     if (selectedHexes.length === 2) {
       const newBoardLayout = [...boardLayout];
-      if (newBoardLayout[selectedHexes[0]].fill === "desert" || newBoardLayout[selectedHexes[1]].fill === "desert") {
+      if ((newBoardLayout[selectedHexes[0]].fill === "desert" || newBoardLayout[selectedHexes[0]].fill === "ocean") &&
+      (newBoardLayout[selectedHexes[1]].fill === "desert" || newBoardLayout[selectedHexes[1]].fill === "ocean")) {
+        setErrorMessage("No number tokens to swap.");
+
+        // Clear the error message after 3 seconds
+        setTimeout(() => {
+          setErrorMessage("");
+        }, 3000);
+    } else if (newBoardLayout[selectedHexes[0]].fill === "desert" || newBoardLayout[selectedHexes[1]].fill === "desert") {
         setErrorMessage("Invalid Swap. Desert cannot have a number token.");
 
         // Clear the error message after 3 seconds
