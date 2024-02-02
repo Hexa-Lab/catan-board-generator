@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { HexGrid, Layout, Pattern, Hexagon } from "react-hexgrid";
-import NumberTileBackground from '../../components/NumberTileBackground';
-import Tile from '../../components/Tile';
 import { Hexes, Bridges, Ports } from './constants';
+import { Button, Alert } from '@mui/material'
 
 const ExtendedBaseGame = (props) => {
   const [boardLayout, setBoardLayout] = useState(Hexes);
   const [bridges,] = useState(Bridges)
   const [ports,] = useState(Ports)
+  const [selectedHexes, setSelectedHexes] = useState([]);
+  const [showAcceptButtons, setShowAcceptButtons] = useState()
   const {twoTwelve} = props
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     shuffleBoard();
@@ -27,13 +29,13 @@ const ExtendedBaseGame = (props) => {
     document.addEventListener('keydown', handleKeyDown, false);
 
     return () => document.removeEventListener('keydown', handleKeyDown, false);
-  }, []);
+  }, [shuffleBoard]);
 
   function calculatePips(number) {
     switch (number) {
       case 2:
       case 12:
-        return 1;
+        return twoTwelve ? 2 : 1;
       case 3:
       case 11:
         return 2;
@@ -237,15 +239,6 @@ const ExtendedBaseGame = (props) => {
     }
   }
 
-  function shufflePorts() {
-      // Shuffle 'fill' attributes including the desert
-      const fills = ports.map(port => port.fill);
-      shuffleArray(fills);
-      for (let i = 0; i < ports.length; i++) {
-        ports[i].fill = fills[i];
-      }
-  }
-
   function shuffleBoard() {
     shuffleFills();
     shuffleNumbers();
@@ -253,6 +246,77 @@ const ExtendedBaseGame = (props) => {
     // Update the state to trigger re-render
     setBoardLayout([...boardLayout]);
   }
+
+  const handleHexClick = (index) => {
+    const alreadySelected = selectedHexes.includes(index);
+
+    if (alreadySelected) {
+      setSelectedHexes(selectedHexes.filter(i => i !== index));
+      if (selectedHexes.length <= 2) setShowAcceptButtons(false);
+    } else if (selectedHexes.length < 2) {
+      setSelectedHexes([...selectedHexes, index]);
+      if (selectedHexes.length === 1) setShowAcceptButtons(true);
+    }
+  };
+
+  const handleSwapResources = () => {
+    if (selectedHexes.length === 2) {
+      const newBoardLayout = [...boardLayout];
+      if (newBoardLayout[selectedHexes[0]].fill === "desert" || newBoardLayout[selectedHexes[1]].fill === "desert") {
+        setErrorMessage("Invalid Swap. Desert cannot have a number token.");
+
+        // Clear the error message after 3 seconds
+        setTimeout(() => {
+          setErrorMessage("");
+        }, 3000);
+      } else {
+        const fillTemp = newBoardLayout[selectedHexes[0]].fill
+        newBoardLayout[selectedHexes[0]].fill = newBoardLayout[selectedHexes[1]].fill
+        newBoardLayout[selectedHexes[1]].fill = fillTemp
+  
+        setBoardLayout(newBoardLayout);
+      }
+      setSelectedHexes([]);
+      setShowAcceptButtons(false);
+    }
+  };
+  const handleSwapNumbers = () => {
+    if (selectedHexes.length === 2) {
+      const newBoardLayout = [...boardLayout];
+      if (newBoardLayout[selectedHexes[0]].fill === "desert" || newBoardLayout[selectedHexes[1]].fill === "desert") {
+        setErrorMessage("Invalid Swap. Desert cannot have a number token.");
+
+        // Clear the error message after 3 seconds
+        setTimeout(() => {
+          setErrorMessage("");
+        }, 3000);
+      } else {
+        const numberTemp = newBoardLayout[selectedHexes[0]].number
+        newBoardLayout[selectedHexes[0]].number = newBoardLayout[selectedHexes[1]].number
+        newBoardLayout[selectedHexes[1]].number = numberTemp
+        setBoardLayout(newBoardLayout);
+      }
+
+      setSelectedHexes([]);
+      setShowAcceptButtons(false);
+    }
+  };
+
+  const handleSwapResourcesAndNumbers = () => {
+    if (selectedHexes.length === 2) {
+      const newBoardLayout = [...boardLayout];
+      const numberTemp = newBoardLayout[selectedHexes[0]].number
+      newBoardLayout[selectedHexes[0]].number = newBoardLayout[selectedHexes[1]].number
+      newBoardLayout[selectedHexes[1]].number = numberTemp
+      const fillTemp = newBoardLayout[selectedHexes[0]].fill
+      newBoardLayout[selectedHexes[0]].fill = newBoardLayout[selectedHexes[1]].fill
+      newBoardLayout[selectedHexes[1]].fill = fillTemp
+
+      setBoardLayout(newBoardLayout);
+      setSelectedHexes([]);
+      setShowAcceptButtons(false);
+    }
+  };
 
   return (
     <>
@@ -278,12 +342,6 @@ const ExtendedBaseGame = (props) => {
                     strokeOpacity={.7}
                     fill={hex.fill}
                   >
-                    {hex.number && (
-                      <>
-                        <NumberTileBackground />
-                        <Tile hex={hex} twoTwelve={twoTwelve} />
-                      </>
-                    )}
                   </Hexagon>
                 ))}
                 <Pattern id="forest" link="/assets/images/hexes/wood.png" />
@@ -295,8 +353,45 @@ const ExtendedBaseGame = (props) => {
               </Layout>
             </HexGrid>
           </div>
+          <div className="tokens" style={{zIndex: 1, position: "absolute"}}>
+            <HexGrid width={1000} height={1000} viewBox="-70 -70 140 140"
+              style={{ transform: "rotate(90deg)" }}>
+              <Layout
+                size={{ x: 10, y: 10 }}
+                flat={true}
+                spacing={1}
+                origin={{ x: 0, y: 0 }}
+              >
+                {boardLayout.map((hex, index) => (
+                  <Hexagon
+                    key={index}
+                    q={hex.q}
+                    r={hex.r - 0.5}
+                    s={hex.s}
+                    stroke={selectedHexes.includes(index) ? "red" : null}
+                    strokeWidth={selectedHexes.includes(index) ? 0.7 : null}
+                    fill={hex.number ? (twoTwelve && (hex.number === 2 || hex.number === 12)) ? "2-12" : `${hex.number}` : "blank"}
+                    onClick={() => handleHexClick(index)}
+                  >
+                  </Hexagon>
+                ))}
+                <Pattern id="2" link="/assets/images/tokens/2.png" style={{transform: "scale(200)"}} />
+                <Pattern id="3" link="/assets/images/tokens/3.png" />
+                <Pattern id="4" link="/assets/images/tokens/4.png" />
+                <Pattern id="5" link="/assets/images/tokens/5.png" />
+                <Pattern id="6" link="/assets/images/tokens/6.png" />
+                <Pattern id="8" link="/assets/images/tokens/8.png" />
+                <Pattern id="9" link="/assets/images/tokens/9.png" />
+                <Pattern id="10" link="/assets/images/tokens/10.png" />
+                <Pattern id="11" link="/assets/images/tokens/11.png" />
+                <Pattern id="12" link="/assets/images/tokens/12.png" />
+                <Pattern id="2-12" link="/assets/images/tokens/2-12.png" />
+                <Pattern id="blank" link="/assets/images/tokens/blank.png" />
+              </Layout>
+            </HexGrid>
+          </div>
         </div>
-        <div className="bridges" style={{position: "absolute", zIndex: 1}}>
+        <div className="bridges" style={{position: "absolute"}}>
           <HexGrid width={1000} height={1000} viewBox="-70 -70 140 140"
               style={{ transform: "rotate(90deg)" }}>
               <Layout
@@ -324,7 +419,7 @@ const ExtendedBaseGame = (props) => {
               </Layout>
             </HexGrid>
           </div>
-          <div className="ports" style={{position: "absolute", zIndex: 1}}>
+          <div className="ports" style={{position: "absolute"}}>
             <HexGrid width={1000} height={1000} viewBox="-70 -70 140 140"
               style={{ transform: "rotate(90deg)" }}>
               <Layout
@@ -353,6 +448,24 @@ const ExtendedBaseGame = (props) => {
             </HexGrid>
           </div>
       </div>
+      {showAcceptButtons && (
+        <div className="accept-buttons" style={{ zIndex: 2, position: 'absolute', bottom: 50, right: '50%', transform: 'translateX(50%)' }}>
+          <Button variant="contained" color="primary" onClick={handleSwapNumbers}>
+            swap numbers
+          </Button>
+          <Button variant="contained" color="primary" onClick={handleSwapResources}>
+            swap resources
+          </Button>
+          <Button variant="contained" color="primary" onClick={handleSwapResourcesAndNumbers}>
+            swap both
+          </Button>
+        </div>
+      )}
+      {errorMessage && (
+        <Alert variant="filled" severity="error" style={{position: "absolute", top: "20px", left: 0, right: 0, width: "max-content", marginLeft: "auto", marginRight: "auto"}}>
+          {errorMessage}
+      </Alert>
+      )}
     </>
   );
 };
