@@ -4,11 +4,28 @@ import BaseGame from './modes/base/game';
 import ExtendedBaseGame from './modes/extended-base/game';
 import FourIslands from './modes/four-islands/game';
 import BarbarianTracker from './components/BarbarianTracker';
+import DiceDisplay from './components/DiceDisplay';
+import DiceStats from './components/DiceStats';
 
 function App() {
   const [gameMode, setGameMode] = useState('base');
   const [twoTwelve, setTwoTwelve] = useState(false);
   const [showBarbarianTracker, setShowBarbarianTracker] = useState(false);
+  const [diceRolls, setDiceRolls] = useState([
+    { number: 2, value: 0 },
+    { number: 3, value: 0 },
+    { number: 4, value: 0 },
+    { number: 5, value: 0 },
+    { number: 6, value: 0 },
+    { number: 7, value: 0 },
+    { number: 8, value: 0 },
+    { number: 9, value: 0 },
+    { number: 10, value: 0 },
+    { number: 11, value: 0 },
+    { number: 12, value: 0 },
+  ]);
+  const [showGraph, setShowGraph] = useState(false);
+  const [lastRoll, setLastRoll] = useState(null); 
 
   useEffect(() => {
     function handleKeyDown(e) {
@@ -38,20 +55,47 @@ function App() {
       if (e.keyCode === 86) {
         setShowBarbarianTracker(!showBarbarianTracker);
       }
+
+      // Key: S
+      if (e.keyCode === 83) {
+        setShowGraph(!showGraph);
+      }
+
+      //Key: D
+      if (e.keyCode === 68) {
+        handleDiceRoll(); // Update the dice rolls count
+      }
     }
 
     document.addEventListener('keydown', handleKeyDown, false);
 
     return () => document.removeEventListener('keydown', handleKeyDown, false);
-  }, [twoTwelve, showBarbarianTracker]);
+  }, [twoTwelve, showBarbarianTracker, showGraph]);
+
+  const handleDiceRoll = () => {
+    const dice1 = Math.floor(Math.random() * 6) + 1;
+    const dice2 = Math.floor(Math.random() * 6) + 1;
+    const roll = dice1 + dice2;
+    setLastRoll({ dice1, dice2, sum: roll }); // Store the result to display
+    setDiceRolls(prevRolls =>
+      prevRolls.map(diceRoll =>
+        diceRoll.number === roll
+          ? { ...diceRoll, value: diceRoll.value + 1 }
+          : diceRoll
+      )
+    );
+  };
+
 
   return (
-      <div className="App">
-        {gameMode === 'base' && <BaseGame twoTwelve={twoTwelve}/>}
-        {gameMode === 'extendedBase' && <ExtendedBaseGame twoTwelve={twoTwelve}/>}
-        {gameMode === 'fourIslands' && <FourIslands twoTwelve={twoTwelve}/>}
-        {showBarbarianTracker && <BarbarianTracker />}
-      </div>
+    <div className="App">
+      {gameMode === 'base' && <BaseGame twoTwelve={twoTwelve} />}
+      {gameMode === 'extendedBase' && <ExtendedBaseGame twoTwelve={twoTwelve} />}
+      {gameMode === 'fourIslands' && <FourIslands twoTwelve={twoTwelve} />}
+      {showBarbarianTracker && <BarbarianTracker />}
+      {lastRoll && <DiceDisplay diceRollResult={lastRoll} />} {/* Display the dice roll result */}
+      {showGraph && <div className="graph-container"><DiceStats stats={diceRolls} /></div>}
+    </div>
   );
 }
 
