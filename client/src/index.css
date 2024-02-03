@@ -111,3 +111,10 @@ code {
   background-color: transparent; /* Optional, for visibility */
   z-index: 1000; /* Ensure it's above other content */
 }
+
+.accept-buttons {
+  display: flex;
+  flex-direction: row;
+  width: 600px;
+  justify-content: space-between;
+}
