@@ -10,7 +10,7 @@ import DiceStats from './components/DiceStats';
 function App() {
   const [gameMode, setGameMode] = useState('base');
   const [twoTwelve, setTwoTwelve] = useState(false);
-  const [showBarbarianTracker, setShowBarbarianTracker] = useState(false);
+  const [isCitiesAndKnights, setIsCitiesAndKnights] = useState(false);
   const [diceRolls, setDiceRolls] = useState([
     { number: 2, value: 0 },
     { number: 3, value: 0 },
@@ -53,7 +53,7 @@ function App() {
 
       // Key: V
       if (e.keyCode === 86) {
-        setShowBarbarianTracker(!showBarbarianTracker);
+        setIsCitiesAndKnights(!isCitiesAndKnights);
       }
 
       // Key: S
@@ -70,7 +70,7 @@ function App() {
     document.addEventListener('keydown', handleKeyDown, false);
 
     return () => document.removeEventListener('keydown', handleKeyDown, false);
-  }, [twoTwelve, showBarbarianTracker, showGraph]);
+  }, [twoTwelve, isCitiesAndKnights, showGraph]);
 
   const handleDiceRoll = () => {
     const dice1 = Math.floor(Math.random() * 6) + 1;
@@ -100,8 +100,8 @@ function App() {
       {gameMode === 'base' && <BaseGame twoTwelve={twoTwelve} />}
       {gameMode === 'extendedBase' && <ExtendedBaseGame twoTwelve={twoTwelve} />}
       {gameMode === 'fourIslands' && <FourIslands twoTwelve={twoTwelve} />}
-      {showBarbarianTracker && <BarbarianTracker />}
-      {lastRoll && <DiceDisplay diceRollResult={lastRoll} showBarbarianTracker={showBarbarianTracker} />}
+      {isCitiesAndKnights && <BarbarianTracker />}
+      {lastRoll && <DiceDisplay diceRollResult={lastRoll} isCitiesAndKnights={isCitiesAndKnights} />}
       {showGraph && <div className="graph-container"><DiceStats stats={diceRolls} /></div>}
     </div>
   );

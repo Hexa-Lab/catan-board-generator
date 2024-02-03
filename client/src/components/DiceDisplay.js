@@ -20,7 +20,7 @@ export const preloadDiceImages = () => {
   });
 };
 
-const DiceDisplay = ({ diceRollResult, showBarbarianTracker }) => {
+const DiceDisplay = ({ diceRollResult, isCitiesAndKnights }) => {
   useEffect(() => {
     preloadDiceImages(); // Preload images when the component mounts
   }, []);
@@ -34,10 +34,10 @@ const DiceDisplay = ({ diceRollResult, showBarbarianTracker }) => {
   if (!diceRollResult) return null; // Do not render anything if there's no result
 
   return (
-    <div style={{ position: 'absolute', bottom: '100px', right: '100px', display: "flex", width: showBarbarianTracker ? "225px" : "150px", justifyContent: "space-between"}}>
+    <div style={{ position: 'absolute', bottom: '100px', right: '100px', display: "flex", width: isCitiesAndKnights ? "225px" : "150px", justifyContent: "space-between"}}>
       <img src={`/assets/images/dice/red/${diceRollResult.dice1}.png`} style={{width: "70px"}} alt="Red Dice" />
       <img src={`/assets/images/dice/yellow/${diceRollResult.dice2}.png`} style={{width: "70px"}} alt="Yellow Dice" />
-      {showBarbarianTracker && <img src={`/assets/images/dice/event/${eventDieResult()}.png`} style={{width: "70px"}} alt="Event Dice" />}
+      {isCitiesAndKnights && <img src={`/assets/images/dice/event/${eventDieResult()}.png`} style={{width: "70px"}} alt="Event Dice" />}
     </div>
   );
 };
