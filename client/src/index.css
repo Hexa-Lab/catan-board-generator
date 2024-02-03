@@ -101,3 +101,10 @@ code {
 #circle-7 {
   background-color: darkred;
 }
+
+.accept-buttons {
+  display: flex;
+  flex-direction: row;
+  width: 600px;
+  justify-content: space-between;
+}
