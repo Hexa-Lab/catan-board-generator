@@ -78,13 +78,21 @@ function App() {
     const roll = dice1 + dice2;
     setLastRoll({ dice1, dice2, sum: roll }); // Store the result to display
     setDiceRolls(prevRolls =>
-      prevRolls.map(diceRoll =>
-        diceRoll.number === roll
-          ? { ...diceRoll, value: diceRoll.value + 1 }
-          : diceRoll
-      )
+      prevRolls.map(diceRoll => {
+        // If twoTwelve is true and the roll is 2 or 12, increase both 2 and 12
+        if (twoTwelve && (roll === 2 || roll === 12)) {
+          if (diceRoll.number === 2 || diceRoll.number === 12) {
+            return { ...diceRoll, value: diceRoll.value + 1 };
+          }
+        } else if (diceRoll.number === roll) {
+          // If twoTwelve is not true, or the roll is not 2 or 12, proceed as before
+          return { ...diceRoll, value: diceRoll.value + 1 };
+        }
+        return diceRoll;
+      })
     );
   };
+  
 
 
   return (
@@ -93,7 +101,7 @@ function App() {
       {gameMode === 'extendedBase' && <ExtendedBaseGame twoTwelve={twoTwelve} />}
       {gameMode === 'fourIslands' && <FourIslands twoTwelve={twoTwelve} />}
       {showBarbarianTracker && <BarbarianTracker />}
-      {lastRoll && <DiceDisplay diceRollResult={lastRoll} />} {/* Display the dice roll result */}
+      {lastRoll && <DiceDisplay diceRollResult={lastRoll} showBarbarianTracker={showBarbarianTracker} />}
       {showGraph && <div className="graph-container"><DiceStats stats={diceRolls} /></div>}
     </div>
   );
