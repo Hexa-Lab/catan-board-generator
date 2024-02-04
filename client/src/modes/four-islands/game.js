@@ -5,12 +5,13 @@ import { Button, Alert } from '@mui/material'
 
 const FourIslands = (props) => {
   const [boardLayout, setBoardLayout] = useState(Hexes);
-  const [bridges,] = useState(Bridges)
-  const [ports,] = useState(Ports)
+  const [bridges,] = useState(Bridges);
+  const [ports,] = useState(Ports);
   const [selectedHexes, setSelectedHexes] = useState([]);
-  const [showAcceptButtons, setShowAcceptButtons] = useState()
+  const [showAcceptButtons, setShowAcceptButtons] = useState(false);
+  const [isDesertSelected, setIsDesertSelected] = useState(false);
   const { twoTwelve } = props
-  const [errorMessage, setErrorMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     shuffleBoard();
@@ -253,14 +254,19 @@ const FourIslands = (props) => {
 
   const handleHexClick = (index) => {
     const alreadySelected = selectedHexes.includes(index);
+    let newSelectedHexes = selectedHexes;
 
     if (alreadySelected) {
-      setSelectedHexes(selectedHexes.filter(i => i !== index));
-      if (selectedHexes.length <= 2) setShowAcceptButtons(false);
+      newSelectedHexes = selectedHexes.filter(hexIndex => hexIndex !== index);
     } else if (selectedHexes.length < 2) {
-      setSelectedHexes([...selectedHexes, index]);
-      if (selectedHexes.length === 1) setShowAcceptButtons(true);
+      newSelectedHexes = [...selectedHexes, index];
+    } else {
+      newSelectedHexes = [...selectedHexes.slice(1), index];
     }
+
+    setSelectedHexes(newSelectedHexes);
+    setIsDesertSelected(newSelectedHexes.some(hexIndex => boardLayout[hexIndex].fill === 'desert'));
+    setShowAcceptButtons(newSelectedHexes.length === 2);
   };
 
   const handleSwapResources = () => {
@@ -483,16 +489,24 @@ const FourIslands = (props) => {
         </div>
       </div>
       {showAcceptButtons && (
-        <div className="accept-buttons" style={{ zIndex: 2, position: 'absolute', bottom: 50, right: '50%', transform: 'translateX(50%)' }}>
-          <Button variant="contained" color="primary" onClick={handleSwapNumbers}>
-            swap numbers
-          </Button>
-          <Button variant="contained" color="primary" onClick={handleSwapResources}>
-            swap resources
-          </Button>
-          <Button variant="contained" color="primary" onClick={handleSwapResourcesAndNumbers}>
-            swap both
-          </Button>
+        <div className="accept-buttons" style={{ zIndex: 2, position: 'absolute', bottom: 50, right: '50%', transform: 'translateX(50%)', display: 'flex', justifyContent: 'center' }}>
+          {isDesertSelected ? (
+            <Button variant="contained" onClick={handleSwapResourcesAndNumbers} style={{ backgroundColor: '#196a7e', color: 'white'}}>
+              swap
+            </Button>
+          ) : (
+            <>
+              <Button variant="contained" onClick={handleSwapNumbers} style={{ marginRight: '10%', backgroundColor: '#196a7e', color: 'white' }}>
+                swap numbers
+              </Button>
+              <Button variant="contained" onClick={handleSwapResources} style={{ marginRight: '10%', backgroundColor: '#196a7e', color: 'white' }}>
+                swap resources
+              </Button>
+              <Button variant="contained" onClick={handleSwapResourcesAndNumbers} style={{ backgroundColor: '#196a7e', color: 'white'}}>
+                swap both
+              </Button>
+            </>
+          )}
         </div>
       )}
       {errorMessage && (
