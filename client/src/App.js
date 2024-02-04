@@ -11,6 +11,7 @@ function App() {
   const [gameMode, setGameMode] = useState('base');
   const [twoTwelve, setTwoTwelve] = useState(false);
   const [isCitiesAndKnights, setIsCitiesAndKnights] = useState(false);
+  const [barbarianPosition, setBarbarianPosition] = useState(0);
   const [diceRolls, setDiceRolls] = useState([
     { number: 2, value: 0 },
     { number: 3, value: 0 },
@@ -25,7 +26,8 @@ function App() {
     { number: 12, value: 0 },
   ]);
   const [showGraph, setShowGraph] = useState(false);
-  const [lastRoll, setLastRoll] = useState(null); 
+  const [lastRoll, setLastRoll] = useState(null);
+  const [eventDieResult, setEventDieResult] = useState(null);
 
   useEffect(() => {
     function handleKeyDown(e) {
@@ -76,6 +78,13 @@ function App() {
     const dice1 = Math.floor(Math.random() * 6) + 1;
     const dice2 = Math.floor(Math.random() * 6) + 1;
     const roll = dice1 + dice2;
+    const eventDie = ['pirate', 'pirate', 'pirate', 'green', 'blue', 'yellow'][Math.floor(Math.random() * 6)];
+    setEventDieResult(eventDie); // Set event die result
+    if (eventDie === 'pirate' && isCitiesAndKnights) {
+      // If event die is 'pirate', advance BarbarianTracker
+      setBarbarianPosition(prevPosition => (prevPosition + 1) % 8);
+
+    }
     setLastRoll({ dice1, dice2, sum: roll }); // Store the result to display
     setDiceRolls(prevRolls =>
       prevRolls.map(diceRoll => {
@@ -92,7 +101,7 @@ function App() {
       })
     );
   };
-  
+
 
 
   return (
@@ -100,8 +109,8 @@ function App() {
       {gameMode === 'base' && <BaseGame twoTwelve={twoTwelve} />}
       {gameMode === 'extendedBase' && <ExtendedBaseGame twoTwelve={twoTwelve} />}
       {gameMode === 'fourIslands' && <FourIslands twoTwelve={twoTwelve} />}
-      {isCitiesAndKnights && <BarbarianTracker />}
-      {lastRoll && <DiceDisplay diceRollResult={lastRoll} isCitiesAndKnights={isCitiesAndKnights} />}
+      {isCitiesAndKnights && <BarbarianTracker position={barbarianPosition} />}
+      {lastRoll && <DiceDisplay diceRollResult={lastRoll} eventDieResult={eventDieResult} isCitiesAndKnights={isCitiesAndKnights} />}
       {showGraph && <div className="graph-container"><DiceStats stats={diceRolls} /></div>}
     </div>
   );
