@@ -1,6 +1,22 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
-const BarbarianTracker = ({position}) => {
+const BarbarianTracker = () => {
+    const [position, setPosition] = useState(0);
+
+    const handleKeyPress = (event) => {
+        if (event.key === 'b' || event.key === 'B') {
+            setPosition((prevPosition) => (prevPosition + 1) % 8);
+        }
+    };
+
+    useEffect(() => {
+        window.addEventListener('keydown', handleKeyPress);
+
+        return () => {
+            window.removeEventListener('keydown', handleKeyPress);
+        };
+    }, []);
+
     return (
         <div className="barbarian-tracker">
             {[...Array(8)].map((_, index) => (
