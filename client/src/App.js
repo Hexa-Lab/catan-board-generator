@@ -81,9 +81,16 @@ function App() {
     const eventDie = ['pirate', 'pirate', 'pirate', 'green', 'blue', 'yellow'][Math.floor(Math.random() * 6)];
     setEventDieResult(eventDie); // Set event die result
     if (eventDie === 'pirate' && isCitiesAndKnights) {
-      // If event die is 'pirate', advance BarbarianTracker
-      setBarbarianPosition(prevPosition => (prevPosition + 1) % 8);
-
+      setBarbarianPosition(prevPosition => {
+        if (prevPosition + 1 >= 7) { // Assuming 7 is the max position before reset
+          setTimeout(() => {
+            setBarbarianPosition(0); // Reset after 3 seconds
+          }, 1000);
+          return 7; // Return the max position and wait before resetting
+        } else {
+          return prevPosition + 1;
+        }
+      });
     }
     setLastRoll({ dice1, dice2, sum: roll }); // Store the result to display
     setDiceRolls(prevRolls =>
