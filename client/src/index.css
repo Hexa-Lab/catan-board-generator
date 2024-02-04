@@ -105,6 +105,16 @@ code {
   background-color: darkred;
 }
 
+.graph-container {
+  position: absolute;
+  top: 50px;
+  right: 50px;
+  width: 300px; /* Adjust based on your preference */
+  height: 200px; /* Adjust based on your preference */
+  background-color: transparent; /* Optional, for visibility */
+  z-index: 1000; /* Ensure it's above other content */
+}
+
 .accept-buttons {
   display: flex;
   flex-direction: row;
