@@ -6,28 +6,31 @@ const DiceStats = ({ numberStats, eventStats, isCitiesAndKnights }) => {
     const [group, setGroup] = useState('numbers')
 
     useEffect(() => {
-        if(!isCitiesAndKnights) {
+        if (!isCitiesAndKnights) {
             setGroup("numbers")
         }
     }, [isCitiesAndKnights])
 
     const handleChange = (event, newGroup) => {
-        setGroup(newGroup)
+        if (newGroup !== null) {
+            setGroup(newGroup)
+        }
     }
 
     return (
         <div style={{ position: 'absolute', top: 30, right: 30, width: "max-content", height: "max-content", backgroundColor: "rgba(255, 255, 255, 0.5)", borderRadius: "30px" }}>
             {isCitiesAndKnights &&
-            <div style={{ width: "100%", display: "flex", justifyContent: "space-evenly", marginTop: 10 }}>
-                <ToggleButtonGroup
-                    exclusive
-                    onChange={handleChange}
-                    value={group}
-                >
-                    <ToggleButton value="numbers">Numbers</ToggleButton>
-                    <ToggleButton value="event">Event Die</ToggleButton>
-                </ToggleButtonGroup>
-            </div>
+                <div style={{ width: "100%", display: "flex", justifyContent: "space-evenly", marginTop: 0 }}>
+                        <ToggleButtonGroup
+                            exclusive
+                            onChange={handleChange}
+                            value={group}
+                            style={{ width: "100%", borderTopLeftRadius: "30px", borderTopRightRadius: "30px"}}
+                        >
+                            <ToggleButton style={{flex: 1, borderTopLeftRadius: "30px", borderBottomLeftRadius: "0px"}} value="numbers">Numbers</ToggleButton>
+                            <ToggleButton style={{flex: 1, borderTopRightRadius: "30px", borderBottomRightRadius: "0px"}} value="event">Event Die</ToggleButton>
+                        </ToggleButtonGroup>
+                </div>
             }
             {group === "numbers" &&
                 <div>
