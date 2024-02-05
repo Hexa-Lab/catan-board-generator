@@ -18,7 +18,7 @@ const DiceStats = ({ numberStats, eventStats, isCitiesAndKnights }) => {
     }
 
     return (
-        <div style={{ position: 'absolute', top: 30, right: 30, width: "max-content", height: "max-content", backgroundColor: "rgba(255, 255, 255, 0.5)", borderRadius: "30px" }}>
+        <div style={{ position: 'absolute', top: 30, right: 30, width: "470px", height: "max-content", backgroundColor: "rgba(255, 255, 255, 0.5)", borderRadius: "30px" }}>
             {isCitiesAndKnights &&
                 <div style={{ width: "100%", display: "flex", justifyContent: "space-evenly", marginTop: 0 }}>
                         <ToggleButtonGroup
