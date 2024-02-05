@@ -380,6 +380,7 @@ const FourIslands = (props) => {
                     strokeWidth={0.2}
                     strokeOpacity={.7}
                     fill={hex.fill}
+                    opacity={hex.fill === "ocean" ? 0.5 : 1}
                   >
                   </Hexagon>
                 ))}
