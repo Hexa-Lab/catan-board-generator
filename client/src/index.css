@@ -61,9 +61,10 @@ code {
   justify-content: space-around;
   width: 160px; /* Adjusted to accommodate the wider zig-zag pattern */
   height: 400px;
-  background-color: transparent; /* Ocean color */
+  background-color: rgba(200, 255, 255, 0.8); /* Ocean color */
   border-radius: 10px;
   padding: 10px;
+  border: 40px solid rgba(255, 255, 255, 0);
 }
 
 .circle {
@@ -71,6 +72,7 @@ code {
   height: 50px;
   border-radius: 50%;
   background-color: #f0f0f0;
+  border: 2px solid black;
   position: absolute; /* Changed to absolute */
   transition: left 0.3s ease, background-color 0.3s ease;
 }

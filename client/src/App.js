@@ -25,6 +25,12 @@ function App() {
     { number: 11, value: 0 },
     { number: 12, value: 0 },
   ]);
+  const [eventRolls, setEventRolls] = useState([
+    { side: "pirate", value: 0 },
+    { side: "blue", value: 0 },
+    { side: "green", value: 0 },
+    { side: "yellow", value: 0 }
+  ])
   const [showGraph, setShowGraph] = useState(false);
   const [lastRoll, setLastRoll] = useState(null);
   const [eventDieResult, setEventDieResult] = useState(null);
@@ -79,7 +85,17 @@ function App() {
     const dice2 = Math.floor(Math.random() * 6) + 1;
     const roll = dice1 + dice2;
     const eventDie = ['pirate', 'pirate', 'pirate', 'green', 'blue', 'yellow'][Math.floor(Math.random() * 6)];
-    setEventDieResult(eventDie); // Set event die result
+    if (isCitiesAndKnights) {
+      setEventDieResult(eventDie); // Set event die result
+      setEventRolls(prevRolls =>
+        prevRolls.map(eventRoll => {
+          if (eventRoll.side === eventDie) {
+            return { ...eventRoll, value: eventRoll.value + 1 };
+          }
+          return eventRoll;
+        })
+      );
+    }
     if (eventDie === 'pirate' && isCitiesAndKnights) {
       setBarbarianPosition(prevPosition => {
         if (prevPosition + 1 >= 7) { // Assuming 7 is the max position before reset
@@ -118,7 +134,7 @@ function App() {
       {gameMode === 'fourIslands' && <FourIslands twoTwelve={twoTwelve} />}
       {isCitiesAndKnights && <BarbarianTracker position={barbarianPosition} />}
       {lastRoll && <DiceDisplay diceRollResult={lastRoll} eventDieResult={eventDieResult} isCitiesAndKnights={isCitiesAndKnights} />}
-      {showGraph && <div className="graph-container"><DiceStats stats={diceRolls} /></div>}
+      {showGraph && <div className="graph-container"><DiceStats numberStats={diceRolls} eventStats={eventRolls} isCitiesAndKnights={isCitiesAndKnights} /></div>}
     </div>
   );
 }
