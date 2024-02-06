@@ -9,7 +9,7 @@ const FourIslands = (props) => {
   const [ports,] = useState(Ports);
   const [selectedHexes, setSelectedHexes] = useState([]);
   const [showAcceptButtons, setShowAcceptButtons] = useState(false);
-  const [isDesertSelected, setIsDesertSelected] = useState(false);
+  const [isInvalidHexSelected, setIsInvalidHexSelected] = useState(false);
   const { twoTwelve } = props
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -265,7 +265,7 @@ const FourIslands = (props) => {
     }
 
     setSelectedHexes(newSelectedHexes);
-    setIsDesertSelected(newSelectedHexes.some(hexIndex => boardLayout[hexIndex].fill === 'desert'));
+    setIsInvalidHexSelected(newSelectedHexes.some(hexIndex => boardLayout[hexIndex].fill === 'desert' || boardLayout[hexIndex].fill === 'ocean'));
     setShowAcceptButtons(newSelectedHexes.length === 2);
   };
 
@@ -304,6 +304,7 @@ const FourIslands = (props) => {
       setShowAcceptButtons(false);
     }
   };
+  
   const handleSwapNumbers = () => {
     if (selectedHexes.length === 2) {
       const newBoardLayout = [...boardLayout];
@@ -491,7 +492,7 @@ const FourIslands = (props) => {
       </div>
       {showAcceptButtons && (
         <div className="accept-buttons" style={{ zIndex: 2, position: 'absolute', bottom: 50, right: '50%', transform: 'translateX(50%)', display: 'flex', justifyContent: 'center' }}>
-          {isDesertSelected ? (
+          {showAcceptButtons && isInvalidHexSelected ? (
             <Button variant="contained" onClick={handleSwapResourcesAndNumbers} style={{ backgroundColor: '#196a7e', color: 'white'}}>
               swap
             </Button>

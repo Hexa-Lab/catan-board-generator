@@ -8,10 +8,15 @@ import DiceDisplay from './components/DiceDisplay';
 import DiceStats from './components/DiceStats';
 
 function App() {
+  const [lastRoll, setLastRoll] = useState(null);
   const [gameMode, setGameMode] = useState('base');
   const [twoTwelve, setTwoTwelve] = useState(false);
-  const [isCitiesAndKnights, setIsCitiesAndKnights] = useState(false);
+  const [showGraph, setShowGraph] = useState(false);
+  const [diceLoading, setDiceLoading] = useState(false);
+  const [eventDieResult, setEventDieResult] = useState(null);
   const [barbarianPosition, setBarbarianPosition] = useState(0);
+  const [isCitiesAndKnights, setIsCitiesAndKnights] = useState(false);
+
   const [diceRolls, setDiceRolls] = useState([
     { number: 2, value: 0 },
     { number: 3, value: 0 },
@@ -30,10 +35,7 @@ function App() {
     { side: "blue", value: 0 },
     { side: "green", value: 0 },
     { side: "yellow", value: 0 }
-  ])
-  const [showGraph, setShowGraph] = useState(false);
-  const [lastRoll, setLastRoll] = useState(null);
-  const [eventDieResult, setEventDieResult] = useState(null);
+  ]);
 
   useEffect(() => {
     function handleKeyDown(e) {
@@ -81,10 +83,34 @@ function App() {
   }, [twoTwelve, isCitiesAndKnights, showGraph]);
 
   const handleDiceRoll = () => {
-    const dice1 = Math.floor(Math.random() * 6) + 1;
-    const dice2 = Math.floor(Math.random() * 6) + 1;
-    const roll = dice1 + dice2;
+    setDiceLoading(true);
+    const intervalTime = 100;
+    const loadingDuration = 700;
+
+    let elapsed = 0;
+    const interval = setInterval(() => {
+      if (elapsed >= loadingDuration) {
+        clearInterval(interval);
+        performDiceRoll();
+        setDiceLoading(false);
+      } else {
+        setLastRoll({
+          firstDice: Math.floor(Math.random() * 6) + 1,
+          secondDice: Math.floor(Math.random() * 6) + 1,
+          sum: null
+        });
+
+        elapsed += intervalTime;
+      }
+    }, intervalTime);
+  };
+
+  const performDiceRoll = () => {
+    const firstDice = Math.floor(Math.random() * 6) + 1;
+    const secondDice = Math.floor(Math.random() * 6) + 1;
+    const roll = firstDice + secondDice;
     const eventDie = ['pirate', 'pirate', 'pirate', 'green', 'blue', 'yellow'][Math.floor(Math.random() * 6)];
+
     if (isCitiesAndKnights) {
       setEventDieResult(eventDie); // Set event die result
       setEventRolls(prevRolls =>
@@ -96,6 +122,7 @@ function App() {
         })
       );
     }
+
     if (eventDie === 'pirate' && isCitiesAndKnights) {
       setBarbarianPosition(prevPosition => {
         if (prevPosition + 1 >= 7) { // Assuming 7 is the max position before reset
@@ -108,7 +135,8 @@ function App() {
         }
       });
     }
-    setLastRoll({ dice1, dice2, sum: roll }); // Store the result to display
+
+    setLastRoll({ dice1: firstDice, dice2: secondDice, sum: roll }); // Store the result to display
     setDiceRolls(prevRolls =>
       prevRolls.map(diceRoll => {
         // If twoTwelve is true and the roll is 2 or 12, increase both 2 and 12
@@ -123,18 +151,18 @@ function App() {
         return diceRoll;
       })
     );
-  };
-
-
+  }
 
   return (
     <div className="App">
       {gameMode === 'base' && <BaseGame twoTwelve={twoTwelve} />}
       {gameMode === 'extendedBase' && <ExtendedBaseGame twoTwelve={twoTwelve} />}
       {gameMode === 'fourIslands' && <FourIslands twoTwelve={twoTwelve} />}
-      {isCitiesAndKnights && <BarbarianTracker position={barbarianPosition} />}
-      {lastRoll && <DiceDisplay diceRollResult={lastRoll} eventDieResult={eventDieResult} isCitiesAndKnights={isCitiesAndKnights} />}
-      {showGraph && <div className="graph-container"><DiceStats numberStats={diceRolls} eventStats={eventRolls} isCitiesAndKnights={isCitiesAndKnights} /></div>}
+
+      {isCitiesAndKnights && <BarbarianTracker position={barbarianPosition} />} {/* Enable barbarian tracker as part of C&K */}
+      {diceLoading && <DiceDisplay diceRollResult={{ dice1: '?', dice2: '?' }} eventDieResult={null} isCitiesAndKnights={isCitiesAndKnights} />} {/* Dice loading */}
+      {lastRoll && !diceLoading && <DiceDisplay diceRollResult={lastRoll} eventDieResult={eventDieResult} isCitiesAndKnights={isCitiesAndKnights} />} {/* Actual dice roll */}
+      {showGraph && <div className="graph-container"><DiceStats numberStats={diceRolls} eventStats={eventRolls} isCitiesAndKnights={isCitiesAndKnights} /></div>} {/* Dice stats */}
     </div>
   );
 }
