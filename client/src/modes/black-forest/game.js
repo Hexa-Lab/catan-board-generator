@@ -1,28 +1,28 @@
 import React, { useState, useEffect } from "react";
-import { HexGrid, Layout, Pattern, Hexagon } from "react-hexgrid";
+import { HexGrid, Layout, Pattern, Hexagon, Text } from "react-hexgrid";
 import { Hexes, Bridges, Ports } from './constants';
 import { Button, Alert } from '@mui/material'
 
-const ExtendedBaseGame = (props) => {
+const BlackForest = (props) => {
   const [boardLayout, setBoardLayout] = useState(Hexes);
   const [bridges,] = useState(Bridges);
   const [ports,] = useState(Ports);
   const [selectedHexes, setSelectedHexes] = useState([]);
   const [showAcceptButtons, setShowAcceptButtons] = useState(false);
-  const [isDesertSelected, setIsDesertSelected] = useState(false);
-  const {twoTwelve} = props
+  const [isInvalidHexSelected, setIsInvalidHexSelected] = useState(false);
+  const { twoTwelve } = props
   const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
-    shuffleBoard();
+    // shuffleBoard();
   }, boardLayout);
 
   useEffect(() => {
     function handleKeyDown(e) {
       e.preventDefault();
 
-      // Key: 2
-      if (e.keyCode === 50) {
+      // Key: 3
+      if (e.keyCode === 51) {
         shuffleBoard();
       }
     }
@@ -64,17 +64,17 @@ const ExtendedBaseGame = (props) => {
     }
 
     return (
-        pipCounts.forest >= 16 &&
-        pipCounts.forest <= 20 &&
-        pipCounts.brick >= 14 &&
-        pipCounts.brick <= 18 &&
-        pipCounts.sheep >= 16 &&
-        pipCounts.sheep <= 20 &&
-        pipCounts.wheat >= 16 &&
-        pipCounts.wheat <= 20 &&
-        pipCounts.ore >= 14 &&
-        pipCounts.ore <= 18
-      );
+      pipCounts.forest >= 8 &&
+      pipCounts.forest <= 18 &&
+      pipCounts.brick >= 5 &&
+      pipCounts.brick <= 15 &&
+      pipCounts.sheep >= 8 &&
+      pipCounts.sheep <= 18 &&
+      pipCounts.wheat >= 8 &&
+      pipCounts.wheat <= 18 &&
+      pipCounts.ore >= 5 &&
+      pipCounts.ore <= 15
+    );
   }
 
   function shuffleArray(array) {
@@ -93,35 +93,31 @@ const ExtendedBaseGame = (props) => {
   }
 
   function placeSixesAndEights() {
-    let sixesAndEights = [6, 6, 6, 8, 8, 8];
+    let sixesAndEights = [6, 6, 8, 8];
     shuffleArray(sixesAndEights);
-  
-    // Initialize a count for 6s and 8s for each resource type
-    const resourceCounts = { forest: 0, brick: 0, sheep: 0, wheat: 0, ore: 0 };
-  
-    // Helper function to check if a resource type can receive another 6 or 8
-    const canPlaceNumber = (resource, number) => {
-      const counts = Object.values(resourceCounts);
-      const minCount = Math.min(...counts);
-      return resourceCounts[resource] === minCount || (number === 8 && resourceCounts[resource] === minCount + 1);
-    };
-  
+
+    let resourceSixOrEight = { forest: false, brick: false, sheep: false, wheat: false, ore: false };
+
+    // Create an array of indices for hexagons that are not desert
+    let nonDesertIndices = boardLayout
+      .map((hex, index) => (hex.fill !== "desert" && hex.fill !== "ocean") ? index : -1)
+      .filter(index => index !== -1);
+
     for (let number of sixesAndEights) {
-      let nonDesertHexes = boardLayout.filter(hex => hex.fill !== 'desert' && hex.number === null && !isNeighborWithSixOrEight(hex.id));
-      shuffleArray(nonDesertHexes);
-  
+      shuffleArray(nonDesertIndices);
       let placed = false;
-      for (let hex of nonDesertHexes) {
-        if (canPlaceNumber(hex.fill, number)) {
+
+      for (let index of nonDesertIndices) {
+        let hex = boardLayout[index];
+        if (hex.number === null && !isNeighborWithSixOrEight(hex.id) && !resourceSixOrEight[hex.fill]) {
           hex.number = number;
-          resourceCounts[hex.fill]++;
           placed = true;
+          resourceSixOrEight[hex.fill] = true; // Mark this resource as having a 6 or 8
           break;
         }
       }
-  
+
       if (!placed) {
-        // Reset and retry if unable to place number with proper distribution
         boardLayout.forEach(hex => {
           if (hex.fill !== "desert") hex.number = null;
         });
@@ -130,7 +126,7 @@ const ExtendedBaseGame = (props) => {
       }
     }
   }
-  
+
 
   function shuffleFills() {
     let validFills = false;
@@ -139,7 +135,13 @@ const ExtendedBaseGame = (props) => {
     while (!validFills && attempts < 1000) {
       // Shuffle 'fill' attributes including the desert
       const fills = boardLayout.map(hex => hex.fill);
-      shuffleArray(fills);
+      for (let i = fills.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        if (fills[i] === 'ocean' || fills[j] === 'ocean') {
+          continue;
+        }
+        [fills[i], fills[j]] = [fills[j], fills[i]];
+      }
       for (let i = 0; i < boardLayout.length; i++) {
         boardLayout[i].fill = fills[i];
       }
@@ -155,13 +157,6 @@ const ExtendedBaseGame = (props) => {
     }
   }
 
-  function shufflePorts() {
-    const fills = ports.map(port => port.fill);
-    shuffleArray(fills);
-    for (let i = 0; i < ports.length; i++) {
-      ports[i].fill = fills[i];
-    }
-  }
 
   function checkFillValidity() {
     for (const hex of boardLayout) {
@@ -188,11 +183,11 @@ const ExtendedBaseGame = (props) => {
   }
 
   function fillInOtherNumbers() {
-    let otherNumbers = [2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 9, 9, 9, 10, 10, 10, 11, 11, 11, 12, 12];
+    let otherNumbers = [2, 3, 3, 4, 4, 4, 5, 5, 9, 9, 9, 10, 10, 10, 11, 11, 12];
     shuffleArray(otherNumbers);
 
     for (const hex of boardLayout) {
-      if (hex.fill === "desert" || hex.number !== null) continue;
+      if (hex.fill === "desert" || hex.fill === "ocean" || hex.number !== null) continue;
 
       let placed = false;
       for (let i = 0; i < otherNumbers.length; i++) {
@@ -240,6 +235,15 @@ const ExtendedBaseGame = (props) => {
     }
   }
 
+  function shufflePorts() {
+    // Shuffle 'fill' attributes including the desert
+    const fills = ports.map(port => port.fill);
+    shuffleArray(fills);
+    for (let i = 0; i < ports.length; i++) {
+      ports[i].fill = fills[i];
+    }
+  }
+
   function shuffleBoard() {
     shuffleFills();
     shuffleNumbers();
@@ -261,15 +265,29 @@ const ExtendedBaseGame = (props) => {
     }
 
     setSelectedHexes(newSelectedHexes);
-    setIsDesertSelected(newSelectedHexes.some(hexIndex => boardLayout[hexIndex].fill === 'desert'));
+    setIsInvalidHexSelected(newSelectedHexes.some(hexIndex => boardLayout[hexIndex].fill === 'desert' || boardLayout[hexIndex].fill === 'ocean'));
     setShowAcceptButtons(newSelectedHexes.length === 2);
   };
 
   const handleSwapResources = () => {
     if (selectedHexes.length === 2) {
       const newBoardLayout = [...boardLayout];
-      if (newBoardLayout[selectedHexes[0]].fill === "desert" || newBoardLayout[selectedHexes[1]].fill === "desert") {
+      if ((newBoardLayout[selectedHexes[0]].fill === "desert" || newBoardLayout[selectedHexes[0]].fill === "ocean") &&
+        (newBoardLayout[selectedHexes[1]].fill === "desert" || newBoardLayout[selectedHexes[1]].fill === "ocean")) {
+        const fillTemp = newBoardLayout[selectedHexes[0]].fill
+        newBoardLayout[selectedHexes[0]].fill = newBoardLayout[selectedHexes[1]].fill
+        newBoardLayout[selectedHexes[1]].fill = fillTemp
+
+        setBoardLayout(newBoardLayout);
+      } else if (newBoardLayout[selectedHexes[0]].fill === "desert" || newBoardLayout[selectedHexes[1]].fill === "desert") {
         setErrorMessage("Invalid Swap. Desert cannot have a number token.");
+
+        // Clear the error message after 3 seconds
+        setTimeout(() => {
+          setErrorMessage("");
+        }, 3000);
+      } else if (newBoardLayout[selectedHexes[0]].fill === "ocean" || newBoardLayout[selectedHexes[1]].fill === "ocean") {
+        setErrorMessage("Invalid Swap. Ocean cannot have a number token.");
 
         // Clear the error message after 3 seconds
         setTimeout(() => {
@@ -279,18 +297,34 @@ const ExtendedBaseGame = (props) => {
         const fillTemp = newBoardLayout[selectedHexes[0]].fill
         newBoardLayout[selectedHexes[0]].fill = newBoardLayout[selectedHexes[1]].fill
         newBoardLayout[selectedHexes[1]].fill = fillTemp
-  
+
         setBoardLayout(newBoardLayout);
       }
       setSelectedHexes([]);
       setShowAcceptButtons(false);
     }
   };
+  
   const handleSwapNumbers = () => {
     if (selectedHexes.length === 2) {
       const newBoardLayout = [...boardLayout];
-      if (newBoardLayout[selectedHexes[0]].fill === "desert" || newBoardLayout[selectedHexes[1]].fill === "desert") {
+      if ((newBoardLayout[selectedHexes[0]].fill === "desert" || newBoardLayout[selectedHexes[0]].fill === "ocean") &&
+      (newBoardLayout[selectedHexes[1]].fill === "desert" || newBoardLayout[selectedHexes[1]].fill === "ocean")) {
+        setErrorMessage("No number tokens to swap.");
+
+        // Clear the error message after 3 seconds
+        setTimeout(() => {
+          setErrorMessage("");
+        }, 3000);
+    } else if (newBoardLayout[selectedHexes[0]].fill === "desert" || newBoardLayout[selectedHexes[1]].fill === "desert") {
         setErrorMessage("Invalid Swap. Desert cannot have a number token.");
+
+        // Clear the error message after 3 seconds
+        setTimeout(() => {
+          setErrorMessage("");
+        }, 3000);
+      } else if (newBoardLayout[selectedHexes[0]].fill === "ocean" || newBoardLayout[selectedHexes[1]].fill === "ocean") {
+        setErrorMessage("Invalid Swap. Ocean cannot have a number token.");
 
         // Clear the error message after 3 seconds
         setTimeout(() => {
@@ -324,12 +358,18 @@ const ExtendedBaseGame = (props) => {
     }
   };
 
+  const handleReveal = (index) => {
+    const newBoardLayout = [...boardLayout];
+    newBoardLayout[index].hidden = false;
+    setBoardLayout(newBoardLayout)
+  }
+
   return (
     <>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh" }}>
         <div className="hexgrid-container">
-          <div className="board" style={{zIndex: -1, position: "absolute"}}>
-            <HexGrid width={1700} height={1700} viewBox="-100 -100 200 200"
+          <div className="board" style={{ zIndex: -1, position: "absolute" }}>
+            <HexGrid width={1200} height={1200} viewBox="-80 -80 160 160"
               style={{ transform: "rotate(90deg)" }}>
               <Layout
                 size={{ x: 10, y: 10 }}
@@ -341,12 +381,13 @@ const ExtendedBaseGame = (props) => {
                   <Hexagon
                     key={index}
                     q={hex.q}
-                    r={hex.r -0.5}
+                    r={hex.r}
                     s={hex.s}
                     stroke="black"
-                    strokeWidth={0.2}
+                    strokeWidth={hex.hidden ? 0 : 0.2}
                     strokeOpacity={.7}
-                    fill={hex.fill}
+                    fill={hex.hidden ? "hidden" : hex.fill}
+                    opacity={hex.fill === "ocean" ? 0.5 : 1}
                   >
                   </Hexagon>
                 ))}
@@ -356,11 +397,13 @@ const ExtendedBaseGame = (props) => {
                 <Pattern id="sheep" link="/assets/images/hexes/sheep.png" />
                 <Pattern id="brick" link="/assets/images/hexes/brick.png" />
                 <Pattern id="desert" link="/assets/images/hexes/desert.png" />
+                <Pattern id="ocean" link="/assets/images/hexes/ocean.png" />
+                <Pattern id="hidden" link="/assets/images/hexes/hidden.png" />
               </Layout>
             </HexGrid>
           </div>
-          <div className="tokens" style={{zIndex: 1, position: "absolute"}}>
-            <HexGrid width={1700} height={1700} viewBox="-100 -100 200 200"
+          <div className="tokens" style={{ zIndex: 1, position: "absolute" }}>
+            <HexGrid width={1200} height={1200} viewBox="-80 -80 160 160"
               style={{ transform: "rotate(90deg)" }}>
               <Layout
                 size={{ x: 10, y: 10 }}
@@ -372,16 +415,17 @@ const ExtendedBaseGame = (props) => {
                   <Hexagon
                     key={index}
                     q={hex.q}
-                    r={hex.r - 0.5}
+                    r={hex.r}
                     s={hex.s}
                     stroke={selectedHexes.includes(index) ? "red" : null}
                     strokeWidth={selectedHexes.includes(index) ? 0.7 : null}
-                    fill={hex.number ? (twoTwelve && (hex.number === 2 || hex.number === 12)) ? "2-12" : `${hex.number}` : "blank"}
-                    onClick={() => handleHexClick(index)}
+                    fill={
+                      (hex.number && !hex.hidden ? (twoTwelve && (hex.number === 2 || hex.number === 12)) ? "2-12" : `${hex.number}` : "blank")}
+                    onClick={hex.hidden? () => handleReveal(index) : () => handleHexClick(index)}
                   >
                   </Hexagon>
                 ))}
-                <Pattern id="2" link="/assets/images/tokens/2.png" style={{transform: "scale(200)"}} />
+                <Pattern id="2" link="/assets/images/tokens/2.png" style={{ transform: "scale(200)" }} />
                 <Pattern id="3" link="/assets/images/tokens/3.png" />
                 <Pattern id="4" link="/assets/images/tokens/4.png" />
                 <Pattern id="5" link="/assets/images/tokens/5.png" />
@@ -397,66 +441,66 @@ const ExtendedBaseGame = (props) => {
             </HexGrid>
           </div>
         </div>
-        <div className="bridges" style={{position: "absolute"}}>
-          <HexGrid width={1700} height={1700} viewBox="-100 -100 200 200"
-              style={{ transform: "rotate(90deg)" }}>
-              <Layout
-                size={{ x: 10, y: 10 }}
-                flat={true}
-                spacing={1}
-                origin={{ x: 0, y: 0 }}
-              >
-                {bridges.map((bridge, index) => (
-                  <Hexagon
-                    key={index}
-                    q={bridge.q}
-                    r={bridge.r}
-                    s={bridge.s}
-                    fill={bridge.fill}
-                  >
-                  </Hexagon>
-                ))}
-                <Pattern id="bridges-top-left" link="/assets/images/bridges/bridges-bottom-left.png" />
-                <Pattern id="bridges-top-right" link="/assets/images/bridges/bridges-top-left.png" />
-                <Pattern id="bridges-left" link="/assets/images/bridges/bridges-bottom.png" />
-                <Pattern id="bridges-right" link="/assets/images/bridges/bridges-top.png" />
-                <Pattern id="bridges-bottom-left" link="/assets/images/bridges/bridges-bottom-right.png" />
-                <Pattern id="bridges-bottom-right" link="/assets/images/bridges/bridges-top-right.png" />
-              </Layout>
-            </HexGrid>
-          </div>
-          <div className="ports" style={{position: "absolute"}}>
-            <HexGrid width={1700} height={1700} viewBox="-100 -100 200 200"
-              style={{ transform: "rotate(90deg)" }}>
-              <Layout
-                size={{ x: 10, y: 10 }}
-                flat={true}
-                spacing={1}
-                origin={{ x: 0, y: 0 }}
-              >
-                {ports.map((port, index) => (
-                  <Hexagon
-                    key={index}
-                    q={port.q}
-                    r={port.r}
-                    s={port.s}
-                    fill={port.fill}
-                  >
-                  </Hexagon>
-                ))}
-                <Pattern id="any" link="/assets/images/ports/any-port.png" />
-                <Pattern id="ore-port" link="/assets/images/ports/ore-port.png" />
-                <Pattern id="wheat-port" link="/assets/images/ports/wheat-port.png" />
-                <Pattern id="sheep-port" link="/assets/images/ports/sheep-port.png" />
-                <Pattern id="brick-port" link="/assets/images/ports/brick-port.png" />
-                <Pattern id="wood-port" link="/assets/images/ports/wood-port.png" />
-              </Layout>
-            </HexGrid>
-          </div>
+        <div className="bridges" style={{ position: "absolute" }}>
+          <HexGrid width={1200} height={1200} viewBox="-80 -80 160 160"
+            style={{ transform: "rotate(90deg)" }}>
+            <Layout
+              size={{ x: 10, y: 10 }}
+              flat={true}
+              spacing={1}
+              origin={{ x: 0, y: 0 }}
+            >
+              {bridges.map((bridge, index) => (
+                <Hexagon
+                  key={index}
+                  q={bridge.q}
+                  r={bridge.r}
+                  s={bridge.s}
+                  fill={bridge.fill}
+                >
+                </Hexagon>
+              ))}
+              <Pattern id="bridges-top-left" link="/assets/images/bridges/bridges-bottom-left.png" />
+              <Pattern id="bridges-top-right" link="/assets/images/bridges/bridges-top-left.png" />
+              <Pattern id="bridges-left" link="/assets/images/bridges/bridges-bottom.png" />
+              <Pattern id="bridges-right" link="/assets/images/bridges/bridges-top.png" />
+              <Pattern id="bridges-bottom-left" link="/assets/images/bridges/bridges-bottom-right.png" />
+              <Pattern id="bridges-bottom-right" link="/assets/images/bridges/bridges-top-right.png" />
+            </Layout>
+          </HexGrid>
+        </div>
+        <div className="ports" style={{ position: "absolute" }}>
+          <HexGrid width={1200} height={1200} viewBox="-80 -80 160 160"
+            style={{ transform: "rotate(90deg)" }}>
+            <Layout
+              size={{ x: 10, y: 10 }}
+              flat={true}
+              spacing={1}
+              origin={{ x: 0, y: 0 }}
+            >
+              {ports.map((port, index) => (
+                <Hexagon
+                  key={index}
+                  q={port.q}
+                  r={port.r}
+                  s={port.s}
+                  fill={port.fill}
+                >
+                </Hexagon>
+              ))}
+              <Pattern id="any" link="/assets/images/ports/any-port.png" />
+              <Pattern id="ore-port" link="/assets/images/ports/ore-port.png" />
+              <Pattern id="wheat-port" link="/assets/images/ports/wheat-port.png" />
+              <Pattern id="sheep-port" link="/assets/images/ports/sheep-port.png" />
+              <Pattern id="brick-port" link="/assets/images/ports/brick-port.png" />
+              <Pattern id="wood-port" link="/assets/images/ports/wood-port.png" />
+            </Layout>
+          </HexGrid>
+        </div>
       </div>
       {showAcceptButtons && (
         <div className="accept-buttons" style={{ zIndex: 2, position: 'absolute', bottom: 50, right: '50%', transform: 'translateX(50%)', display: 'flex', justifyContent: 'center' }}>
-          {isDesertSelected ? (
+          {showAcceptButtons && isInvalidHexSelected ? (
             <Button variant="contained" onClick={handleSwapResourcesAndNumbers} style={{ backgroundColor: '#196a7e', color: 'white'}}>
               swap
             </Button>
@@ -476,12 +520,12 @@ const ExtendedBaseGame = (props) => {
         </div>
       )}
       {errorMessage && (
-        <Alert variant="filled" severity="error" style={{position: "absolute", top: "20px", left: 0, right: 0, width: "max-content", marginLeft: "auto", marginRight: "auto"}}>
+        <Alert variant="filled" severity="error" style={{ position: "absolute", top: "20px", left: 0, right: 0, width: "max-content", marginLeft: "auto", marginRight: "auto" }}>
           {errorMessage}
-      </Alert>
+        </Alert>
       )}
     </>
   );
 };
 
-export default ExtendedBaseGame;
+export default BlackForest;

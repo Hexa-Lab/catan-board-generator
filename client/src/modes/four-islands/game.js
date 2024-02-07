@@ -64,16 +64,16 @@ const FourIslands = (props) => {
     }
 
     return (
-      pipCounts.forest >= 10 &&
-      pipCounts.forest <= 15 &&
-      pipCounts.brick >= 7 &&
-      pipCounts.brick <= 12 &&
-      pipCounts.sheep >= 10 &&
-      pipCounts.sheep <= 15 &&
-      pipCounts.wheat >= 10 &&
-      pipCounts.wheat <= 15 &&
-      pipCounts.ore >= 7 &&
-      pipCounts.ore <= 12
+      pipCounts.forest >= 8 &&
+      pipCounts.forest <= 18 &&
+      pipCounts.brick >= 5 &&
+      pipCounts.brick <= 15 &&
+      pipCounts.sheep >= 8 &&
+      pipCounts.sheep <= 18 &&
+      pipCounts.wheat >= 8 &&
+      pipCounts.wheat <= 18 &&
+      pipCounts.ore >= 5 &&
+      pipCounts.ore <= 15
     );
   }
 
@@ -363,7 +363,7 @@ const FourIslands = (props) => {
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh" }}>
         <div className="hexgrid-container">
           <div className="board" style={{ zIndex: -1, position: "absolute" }}>
-            <HexGrid width={1000} height={1000} viewBox="-70 -70 140 140"
+            <HexGrid width={1600} height={1120} viewBox="-100 -70 200 140"
               style={{ transform: "rotate(90deg)" }}>
               <Layout
                 size={{ x: 10, y: 10 }}
@@ -396,7 +396,7 @@ const FourIslands = (props) => {
             </HexGrid>
           </div>
           <div className="tokens" style={{ zIndex: 1, position: "absolute" }}>
-            <HexGrid width={1000} height={1000} viewBox="-70 -70 140 140"
+            <HexGrid width={1600} height={1120} viewBox="-100 -70 200 140"
               style={{ transform: "rotate(90deg)" }}>
               <Layout
                 size={{ x: 10, y: 10 }}
@@ -434,7 +434,7 @@ const FourIslands = (props) => {
           </div>
         </div>
         <div className="bridges" style={{ position: "absolute" }}>
-          <HexGrid width={1000} height={1000} viewBox="-70 -70 140 140"
+          <HexGrid width={1600} height={1120} viewBox="-100 -70 200 140"
             style={{ transform: "rotate(90deg)" }}>
             <Layout
               size={{ x: 10, y: 10 }}
@@ -462,7 +462,7 @@ const FourIslands = (props) => {
           </HexGrid>
         </div>
         <div className="ports" style={{ position: "absolute" }}>
-          <HexGrid width={1000} height={1000} viewBox="-70 -70 140 140"
+          <HexGrid width={1600} height={1120} viewBox="-100 -70 200 140"
             style={{ transform: "rotate(90deg)" }}>
             <Layout
               size={{ x: 10, y: 10 }}
