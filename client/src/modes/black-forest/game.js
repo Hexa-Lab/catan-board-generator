@@ -30,7 +30,7 @@ const BlackForest = (props) => {
     document.addEventListener('keydown', handleKeyDown, false);
 
     return () => document.removeEventListener('keydown', handleKeyDown, false);
-  }, [shuffleBoard]);
+  }, []);
 
   function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
@@ -38,41 +38,94 @@ const BlackForest = (props) => {
       [array[i], array[j]] = [array[j], array[i]];
     }
   }
-  
+
+  function shuffleNonLockedFills() {
+    const nonLockedHexes = boardLayout.filter(hex => !hex.locked);
+
+    const fills = nonLockedHexes.map(hex => hex.fill);
+
+    shuffleArray(fills);
+
+    let newBoardLayout = [...boardLayout]
+
+    for (let i = 0; i < fills.length; i++) {
+      for (let j = 0; j < newBoardLayout.length; j++) {
+        if (newBoardLayout[j].locked) {
+          continue;
+        }
+        newBoardLayout[j].fill = fills[i]
+        fills.shift()
+      }
+    }
+
+    setBoardLayout(newBoardLayout);
+  }
+
+
   function placeSixesAndEights(layout) {
     let sixesAndEights = [6, 6, 6, 8, 8, 8];
     shuffleArray(sixesAndEights);
-  
+
     sixesAndEights.forEach(number => {
-      const validHexes = layout.filter(hex => hex.locked && hex.fill !== "desert" && hex.fill !== "ocean" && !isNeighborWithSixOrEight(hex.id, layout) && !hex.number);
+      // Find all hexes that are locked, do not already have a number, and are not adjacent to a 6 or 8.
+      let validHexes = layout.filter(hex => hex.locked && !hex.number && hex.fill !== "desert" && hex.fill !== "ocean" && !isNeighborWithSixOrEight(hex.id, layout));
+
       if (validHexes.length > 0) {
-        const selectedHex = validHexes[0]; // Pick the first valid hex
+        // Randomly select one of the valid hexes
+        const randomIndex = Math.floor(Math.random() * validHexes.length);
+        const selectedHex = validHexes[randomIndex];
         selectedHex.number = number;
       }
     });
   }
-  
+
+
   function assignNumbers(layout, locked) {
     const numbersForLocked = [2, 3, 4, 4, 4, 5, 5, 5, 5, 9, 9, 9, 9, 10, 10, 10, 11, 12];
     const numbersForNonLocked = [3, 4, 4, 4, 4, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 8, 8, 8, 8, 8, 9, 9, 9, 9, 9, 10, 10, 10, 10, 11];
     let numbers = locked ? [...numbersForLocked] : [...numbersForNonLocked];
-  
+
     if (locked) {
       // Handle special placement for 6s and 8s among locked hexes
       placeSixesAndEights(layout);
     }
-  
+
     // Shuffle remaining numbers for randomness
     shuffleArray(numbers);
-  
+
+    // First Pass: Assign numbers with all rules applied
+    numbers.forEach(number => {
+      let validHexes = layout.filter(hex => hex.locked === locked && !hex.number && (hex.fill !== "desert" && hex.fill !== "ocean") && !isNeighborWithSameNumber(hex.id, number, layout));
+      if (validHexes.length > 0) {
+        const randomIndex = Math.floor(Math.random() * validHexes.length);
+        validHexes[randomIndex].number = number;
+      }
+    });
+
+    // Second Pass: Assign numbers to any remaining unassigned hexes
     layout.forEach(hex => {
-      if (hex.locked === locked && (hex.fill !== "desert" && hex.fill !== "ocean" && !hex.number)) {
-        // Ensure this hex hasn't already been assigned a number in special cases
-        hex.number = numbers.shift();
+      if (hex.locked === locked && !hex.number && (hex.fill !== "desert" && hex.fill !== "ocean")) {
+        // Try to find a number that minimizes rule breaking
+        for (let number = 2; number <= 12; number++) {
+          if (!isNeighborWithSameNumber(hex.id, number, layout)) {
+            hex.number = number;
+            break;
+          }
+        }
+        // As a last resort, assign any number if still unassigned
+        if (!hex.number) {
+          hex.number = findLeastProblematicNumber(hex, layout);
+        }
       }
     });
   }
-  
+
+  function findLeastProblematicNumber(hex, layout) {
+    // This function aims to find a number that minimally violates the rules
+    // For simplicity, just return a random number here or implement your logic
+    return Math.floor(Math.random() * (12 - 2 + 1)) + 2; // Random between 2 and 12
+  }
+
   // Utilize assignNumbers during board setup and shuffling
   function shuffleBoard() {
     // Prepare the board layout, hiding non-locked hexes and clearing numbers
@@ -81,15 +134,17 @@ const BlackForest = (props) => {
       hidden: !hex.locked,
       number: null // Clear numbers to reassess distribution
     }));
-  
+
+    shuffleNonLockedFills()
+
     // Shuffle and assign numbers separately for locked and non-locked hexes
     assignNumbers(updatedLayout, true); // Locked hexes
     assignNumbers(updatedLayout, false); // Non-locked hexes
-  
+
     // Update the board layout state
     setBoardLayout(updatedLayout);
   }
-  
+
   function isNeighborWithSixOrEight(hexId, layout) {
     const hex = layout.find(hex => hex.id === hexId);
     if (!hex || !hex.neighbors) return false;
@@ -98,6 +153,16 @@ const BlackForest = (props) => {
       return neighbor && (neighbor.number === 6 || neighbor.number === 8);
     });
   }
+
+  function isNeighborWithSameNumber(hexId, number, layout) {
+    const hex = layout.find(hex => hex.id === hexId);
+    if (!hex || !hex.neighbors) return false;
+    return hex.neighbors.some(neighborId => {
+      const neighbor = layout.find(hex => hex.id === neighborId);
+      return neighbor && neighbor.number === number;
+    });
+  }
+
 
   const handleHexClick = (index) => {
     const alreadySelected = selectedHexes.includes(index);
@@ -207,7 +272,7 @@ const BlackForest = (props) => {
 
   const handleReveal = (index) => {
     const newBoardLayout = [...boardLayout];
-      newBoardLayout[index].hidden = false;
+    newBoardLayout[index].hidden = false;
     setBoardLayout(newBoardLayout)
   }
 
