@@ -6,10 +6,11 @@ import FourIslands from './modes/four-islands/game';
 import BarbarianTracker from './components/BarbarianTracker';
 import DiceDisplay from './components/DiceDisplay';
 import DiceStats from './components/DiceStats';
+import BlackForest from './modes/black-forest/game';
 
 function App() {
   const [lastRoll, setLastRoll] = useState(null);
-  const [gameMode, setGameMode] = useState('base');
+  const [gameMode, setGameMode] = useState('blackForest');
   const [twoTwelve, setTwoTwelve] = useState(false);
   const [showGraph, setShowGraph] = useState(false);
   const [diceLoading, setDiceLoading] = useState(false);
@@ -54,6 +55,11 @@ function App() {
       // Key: 3
       if (e.keyCode === 51) {
         setGameMode('fourIslands')
+      }
+
+      // Key: 3
+      if (e.keyCode === 52) {
+        setGameMode('blackForest')
       }
 
       // Key: T
@@ -158,6 +164,7 @@ function App() {
       {gameMode === 'base' && <BaseGame twoTwelve={twoTwelve} />}
       {gameMode === 'extendedBase' && <ExtendedBaseGame twoTwelve={twoTwelve} />}
       {gameMode === 'fourIslands' && <FourIslands twoTwelve={twoTwelve} />}
+      {gameMode === 'blackForest' && <BlackForest twoTwelve={twoTwelve} />}
 
       {isCitiesAndKnights && <BarbarianTracker position={barbarianPosition} />} {/* Enable barbarian tracker as part of C&K */}
       {diceLoading && <DiceDisplay diceRollResult={{ dice1: '?', dice2: '?' }} eventDieResult={null} isCitiesAndKnights={isCitiesAndKnights} />} {/* Dice loading */}

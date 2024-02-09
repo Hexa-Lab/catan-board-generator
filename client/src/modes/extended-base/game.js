@@ -329,7 +329,7 @@ const ExtendedBaseGame = (props) => {
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh" }}>
         <div className="hexgrid-container">
           <div className="board" style={{zIndex: -1, position: "absolute"}}>
-            <HexGrid width={1000} height={1000} viewBox="-70 -70 140 140"
+            <HexGrid width={1700} height={1700} viewBox="-100 -100 200 200"
               style={{ transform: "rotate(90deg)" }}>
               <Layout
                 size={{ x: 10, y: 10 }}
@@ -360,7 +360,7 @@ const ExtendedBaseGame = (props) => {
             </HexGrid>
           </div>
           <div className="tokens" style={{zIndex: 1, position: "absolute"}}>
-            <HexGrid width={1000} height={1000} viewBox="-70 -70 140 140"
+            <HexGrid width={1700} height={1700} viewBox="-100 -100 200 200"
               style={{ transform: "rotate(90deg)" }}>
               <Layout
                 size={{ x: 10, y: 10 }}
@@ -398,7 +398,7 @@ const ExtendedBaseGame = (props) => {
           </div>
         </div>
         <div className="bridges" style={{position: "absolute"}}>
-          <HexGrid width={1000} height={1000} viewBox="-70 -70 140 140"
+          <HexGrid width={1700} height={1700} viewBox="-100 -100 200 200"
               style={{ transform: "rotate(90deg)" }}>
               <Layout
                 size={{ x: 10, y: 10 }}
@@ -426,7 +426,7 @@ const ExtendedBaseGame = (props) => {
             </HexGrid>
           </div>
           <div className="ports" style={{position: "absolute"}}>
-            <HexGrid width={1000} height={1000} viewBox="-70 -70 140 140"
+            <HexGrid width={1700} height={1700} viewBox="-100 -100 200 200"
               style={{ transform: "rotate(90deg)" }}>
               <Layout
                 size={{ x: 10, y: 10 }}
