@@ -10,7 +10,7 @@ import BlackForest from './modes/black-forest/game';
 
 function App() {
   const [lastRoll, setLastRoll] = useState(null);
-  const [gameMode, setGameMode] = useState('blackForest');
+  const [gameMode, setGameMode] = useState('base');
   const [twoTwelve, setTwoTwelve] = useState(false);
   const [showGraph, setShowGraph] = useState(false);
   const [diceLoading, setDiceLoading] = useState(false);
