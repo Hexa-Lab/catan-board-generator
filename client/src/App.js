@@ -7,12 +7,14 @@ import BarbarianTracker from './components/BarbarianTracker';
 import DiceDisplay from './components/DiceDisplay';
 import DiceStats from './components/DiceStats';
 import BlackForest from './modes/black-forest/game';
+import { ButtonGuide } from './components/ButtonGuide';
 
 function App() {
   const [lastRoll, setLastRoll] = useState(null);
   const [gameMode, setGameMode] = useState('base');
   const [twoTwelve, setTwoTwelve] = useState(false);
   const [showGraph, setShowGraph] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
   const [diceLoading, setDiceLoading] = useState(false);
   const [eventDieResult, setEventDieResult] = useState(null);
   const [barbarianPosition, setBarbarianPosition] = useState(0);
@@ -67,8 +69,8 @@ function App() {
         setTwoTwelve(!twoTwelve);
       }
 
-      // Key: V
-      if (e.keyCode === 86) {
+      // Key: B
+      if (e.keyCode === 66) {
         setIsCitiesAndKnights(!isCitiesAndKnights);
       }
 
@@ -81,12 +83,16 @@ function App() {
       if (e.keyCode === 68) {
         handleDiceRoll(); // Update the dice rolls count
       }
+
+      if (e.keyCode === 77) {
+        setShowMenu(!showMenu);
+      }
     }
 
     document.addEventListener('keydown', handleKeyDown, false);
 
     return () => document.removeEventListener('keydown', handleKeyDown, false);
-  }, [twoTwelve, isCitiesAndKnights, showGraph]);
+  }, [twoTwelve, isCitiesAndKnights, showGraph, showMenu]);
 
   const handleDiceRoll = () => {
     setDiceLoading(true);
@@ -170,6 +176,8 @@ function App() {
       {diceLoading && <DiceDisplay diceRollResult={{ dice1: '?', dice2: '?' }} eventDieResult={null} isCitiesAndKnights={isCitiesAndKnights} />} {/* Dice loading */}
       {lastRoll && !diceLoading && <DiceDisplay diceRollResult={lastRoll} eventDieResult={eventDieResult} isCitiesAndKnights={isCitiesAndKnights} />} {/* Actual dice roll */}
       {showGraph && <div className="graph-container"><DiceStats numberStats={diceRolls} eventStats={eventRolls} isCitiesAndKnights={isCitiesAndKnights} /></div>} {/* Dice stats */}
+      {showMenu && <ButtonGuide />}
+      <h4 style={{position: "absolute", left: "3rem", bottom: "2rem", color: "white"}}>Press "M" to {!showMenu ? "show": "hide"} button guide</h4>
     </div>
   );
 }
