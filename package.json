@@ -24,5 +24,8 @@
   "homepage": "https://github.com/JakeKrummenacher/catan-board-generator#readme",
   "dependencies": {
     "concurrently": "^8.2.2"
+  },
+  "devDependencies": {
+    "gh-pages": "^6.1.1"
   }
 }

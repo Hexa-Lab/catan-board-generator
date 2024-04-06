@@ -1,0 +1,18 @@
+{
+  "files": {
+    "main.css": "/static/css/main.52b6a223.css",
+    "main.js": "/static/js/main.72632cbe.js",
+    "static/js/592.ee4f67fd.chunk.js": "/static/js/592.ee4f67fd.chunk.js",
+    "static/media/catan_background.png": "/static/media/catan_background.ff9bf280b369f68350ef.png",
+    "static/media/Sriracha.ttf": "/static/media/Sriracha.791e4f14671f56ad8ef5.ttf",
+    "static/media/pirate-ship.png": "/static/media/pirate-ship.5c8897b736ac4e083192.png",
+    "index.html": "/index.html",
+    "main.52b6a223.css.map": "/static/css/main.52b6a223.css.map",
+    "main.72632cbe.js.map": "/static/js/main.72632cbe.js.map",
+    "592.ee4f67fd.chunk.js.map": "/static/js/592.ee4f67fd.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.52b6a223.css",
+    "static/js/main.72632cbe.js"
+  ]
+}
