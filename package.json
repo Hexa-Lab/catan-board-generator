@@ -8,7 +8,9 @@
     "server": "cd server && npm start",
     "client": "cd client && npm start",
     "install-client": "cd client && npm install",
-    "install-server": "cd server && npm install"
+    "install-server": "cd server && npm install",
+    "predeploy": "cd client && npm run build",
+    "deploy": "cd client && gh-pages -d build"
   },
   "repository": {
     "type": "git",
