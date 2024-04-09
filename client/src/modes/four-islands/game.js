@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { HexGrid, Layout, Pattern, Hexagon } from "react-hexgrid";
-import { Hexes, Bridges, Ports } from './constants';
-import { Button, Alert } from '@mui/material'
+import { Hexes, Bridges, Ports } from "./constants";
+import { Alert } from "@mui/material";
 
 const FourIslands = (props) => {
   const [boardLayout, setBoardLayout] = useState(Hexes);
-  const [bridges,] = useState(Bridges);
-  const [ports,] = useState(Ports);
+  const [bridges] = useState(Bridges);
+  const [ports] = useState(Ports);
   const [selectedHexes, setSelectedHexes] = useState([]);
   const [showAcceptButtons, setShowAcceptButtons] = useState(false);
   const [isInvalidHexSelected, setIsInvalidHexSelected] = useState(false);
-  const { twoTwelve } = props
-  const [errorMessage, setErrorMessage] = useState('');
+  const { twoTwelve } = props;
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     shuffleBoard();
@@ -27,9 +27,9 @@ const FourIslands = (props) => {
       }
     }
 
-    document.addEventListener('keydown', handleKeyDown, false);
+    document.addEventListener("keydown", handleKeyDown, false);
 
-    return () => document.removeEventListener('keydown', handleKeyDown, false);
+    return () => document.removeEventListener("keydown", handleKeyDown, false);
   }, [shuffleBoard]);
 
   function calculatePips(number) {
@@ -85,8 +85,8 @@ const FourIslands = (props) => {
   }
 
   function isNeighborWithSixOrEight(hexId) {
-    const neighbors = boardLayout.find(hex => hex.id === hexId).neighbors;
-    return neighbors.some(neighborId => {
+    const neighbors = boardLayout.find((hex) => hex.id === hexId).neighbors;
+    return neighbors.some((neighborId) => {
       const neighbor = boardLayout[neighborId];
       return neighbor.number === 6 || neighbor.number === 8;
     });
@@ -96,12 +96,20 @@ const FourIslands = (props) => {
     let sixesAndEights = [6, 6, 8, 8];
     shuffleArray(sixesAndEights);
 
-    let resourceSixOrEight = { forest: false, brick: false, sheep: false, wheat: false, ore: false };
+    let resourceSixOrEight = {
+      forest: false,
+      brick: false,
+      sheep: false,
+      wheat: false,
+      ore: false,
+    };
 
     // Create an array of indices for hexagons that are not desert
     let nonDesertIndices = boardLayout
-      .map((hex, index) => (hex.fill !== "desert" && hex.fill !== "ocean") ? index : -1)
-      .filter(index => index !== -1);
+      .map((hex, index) =>
+        hex.fill !== "desert" && hex.fill !== "ocean" ? index : -1
+      )
+      .filter((index) => index !== -1);
 
     for (let number of sixesAndEights) {
       shuffleArray(nonDesertIndices);
@@ -109,7 +117,11 @@ const FourIslands = (props) => {
 
       for (let index of nonDesertIndices) {
         let hex = boardLayout[index];
-        if (hex.number === null && !isNeighborWithSixOrEight(hex.id) && !resourceSixOrEight[hex.fill]) {
+        if (
+          hex.number === null &&
+          !isNeighborWithSixOrEight(hex.id) &&
+          !resourceSixOrEight[hex.fill]
+        ) {
           hex.number = number;
           placed = true;
           resourceSixOrEight[hex.fill] = true; // Mark this resource as having a 6 or 8
@@ -118,7 +130,7 @@ const FourIslands = (props) => {
       }
 
       if (!placed) {
-        boardLayout.forEach(hex => {
+        boardLayout.forEach((hex) => {
           if (hex.fill !== "desert") hex.number = null;
         });
         placeSixesAndEights(); // Retry recursively
@@ -127,17 +139,16 @@ const FourIslands = (props) => {
     }
   }
 
-
   function shuffleFills() {
     let validFills = false;
     let attempts = 0;
 
     while (!validFills && attempts < 1000) {
       // Shuffle 'fill' attributes including the desert
-      const fills = boardLayout.map(hex => hex.fill);
+      const fills = boardLayout.map((hex) => hex.fill);
       for (let i = fills.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
-        if (fills[i] === 'ocean' || fills[j] === 'ocean') {
+        if (fills[i] === "ocean" || fills[j] === "ocean") {
           continue;
         }
         [fills[i], fills[j]] = [fills[j], fills[i]];
@@ -153,10 +164,11 @@ const FourIslands = (props) => {
     }
 
     if (attempts >= 1000) {
-      console.log("Failed to find a valid fill distribution after 1000 attempts");
+      console.log(
+        "Failed to find a valid fill distribution after 1000 attempts"
+      );
     }
   }
-
 
   function checkFillValidity() {
     for (const hex of boardLayout) {
@@ -175,7 +187,7 @@ const FourIslands = (props) => {
   }
 
   function isNeighborWithSameNumber(hexId, number) {
-    const neighbors = boardLayout.find(hex => hex.id === hexId).neighbors;
+    const neighbors = boardLayout.find((hex) => hex.id === hexId).neighbors;
     return neighbors.some((neighborId) => {
       const neighbor = boardLayout[neighborId];
       return neighbor.number === number;
@@ -183,11 +195,14 @@ const FourIslands = (props) => {
   }
 
   function fillInOtherNumbers() {
-    let otherNumbers = [2, 3, 3, 4, 4, 4, 5, 5, 9, 9, 9, 10, 10, 10, 11, 11, 12];
+    let otherNumbers = [
+      2, 3, 3, 4, 4, 4, 5, 5, 9, 9, 9, 10, 10, 10, 11, 11, 12,
+    ];
     shuffleArray(otherNumbers);
 
     for (const hex of boardLayout) {
-      if (hex.fill === "desert" || hex.fill === "ocean" || hex.number !== null) continue;
+      if (hex.fill === "desert" || hex.fill === "ocean" || hex.number !== null)
+        continue;
 
       let placed = false;
       for (let i = 0; i < otherNumbers.length; i++) {
@@ -202,7 +217,7 @@ const FourIslands = (props) => {
 
       // If a number could not be placed, indicate the need for a reset
       if (!placed) {
-        console.log("could not place a number")
+        console.log("could not place a number");
         return false;
       }
     }
@@ -218,7 +233,7 @@ const FourIslands = (props) => {
       attempts++;
       // Reset numbers
       boardLayout.forEach(
-        (hex) => (hex.number = (hex.fill === "desert") ? null : undefined)
+        (hex) => (hex.number = hex.fill === "desert" ? null : undefined)
       );
 
       placeSixesAndEights();
@@ -231,13 +246,15 @@ const FourIslands = (props) => {
     } while (!success && attempts < 500);
 
     if (attempts >= 500 || !success) {
-      console.log(`Failed to find a valid distribution after ${attempts} attempts`);
+      console.log(
+        `Failed to find a valid distribution after ${attempts} attempts`
+      );
     }
   }
 
   function shufflePorts() {
     // Shuffle 'fill' attributes including the desert
-    const fills = ports.map(port => port.fill);
+    const fills = ports.map((port) => port.fill);
     shuffleArray(fills);
     for (let i = 0; i < ports.length; i++) {
       ports[i].fill = fills[i];
@@ -257,7 +274,7 @@ const FourIslands = (props) => {
     let newSelectedHexes = selectedHexes;
 
     if (alreadySelected) {
-      newSelectedHexes = selectedHexes.filter(hexIndex => hexIndex !== index);
+      newSelectedHexes = selectedHexes.filter((hexIndex) => hexIndex !== index);
     } else if (selectedHexes.length < 2) {
       newSelectedHexes = [...selectedHexes, index];
     } else {
@@ -265,28 +282,45 @@ const FourIslands = (props) => {
     }
 
     setSelectedHexes(newSelectedHexes);
-    setIsInvalidHexSelected(newSelectedHexes.some(hexIndex => boardLayout[hexIndex].fill === 'desert' || boardLayout[hexIndex].fill === 'ocean'));
+    setIsInvalidHexSelected(
+      newSelectedHexes.some(
+        (hexIndex) =>
+          boardLayout[hexIndex].fill === "desert" ||
+          boardLayout[hexIndex].fill === "ocean"
+      )
+    );
     setShowAcceptButtons(newSelectedHexes.length === 2);
   };
 
   const handleSwapResources = () => {
     if (selectedHexes.length === 2) {
       const newBoardLayout = [...boardLayout];
-      if ((newBoardLayout[selectedHexes[0]].fill === "desert" || newBoardLayout[selectedHexes[0]].fill === "ocean") &&
-        (newBoardLayout[selectedHexes[1]].fill === "desert" || newBoardLayout[selectedHexes[1]].fill === "ocean")) {
-        const fillTemp = newBoardLayout[selectedHexes[0]].fill
-        newBoardLayout[selectedHexes[0]].fill = newBoardLayout[selectedHexes[1]].fill
-        newBoardLayout[selectedHexes[1]].fill = fillTemp
+      if (
+        (newBoardLayout[selectedHexes[0]].fill === "desert" ||
+          newBoardLayout[selectedHexes[0]].fill === "ocean") &&
+        (newBoardLayout[selectedHexes[1]].fill === "desert" ||
+          newBoardLayout[selectedHexes[1]].fill === "ocean")
+      ) {
+        const fillTemp = newBoardLayout[selectedHexes[0]].fill;
+        newBoardLayout[selectedHexes[0]].fill =
+          newBoardLayout[selectedHexes[1]].fill;
+        newBoardLayout[selectedHexes[1]].fill = fillTemp;
 
         setBoardLayout(newBoardLayout);
-      } else if (newBoardLayout[selectedHexes[0]].fill === "desert" || newBoardLayout[selectedHexes[1]].fill === "desert") {
+      } else if (
+        newBoardLayout[selectedHexes[0]].fill === "desert" ||
+        newBoardLayout[selectedHexes[1]].fill === "desert"
+      ) {
         setErrorMessage("Invalid Swap. Desert cannot have a number token.");
 
         // Clear the error message after 3 seconds
         setTimeout(() => {
           setErrorMessage("");
         }, 3000);
-      } else if (newBoardLayout[selectedHexes[0]].fill === "ocean" || newBoardLayout[selectedHexes[1]].fill === "ocean") {
+      } else if (
+        newBoardLayout[selectedHexes[0]].fill === "ocean" ||
+        newBoardLayout[selectedHexes[1]].fill === "ocean"
+      ) {
         setErrorMessage("Invalid Swap. Ocean cannot have a number token.");
 
         // Clear the error message after 3 seconds
@@ -294,9 +328,10 @@ const FourIslands = (props) => {
           setErrorMessage("");
         }, 3000);
       } else {
-        const fillTemp = newBoardLayout[selectedHexes[0]].fill
-        newBoardLayout[selectedHexes[0]].fill = newBoardLayout[selectedHexes[1]].fill
-        newBoardLayout[selectedHexes[1]].fill = fillTemp
+        const fillTemp = newBoardLayout[selectedHexes[0]].fill;
+        newBoardLayout[selectedHexes[0]].fill =
+          newBoardLayout[selectedHexes[1]].fill;
+        newBoardLayout[selectedHexes[1]].fill = fillTemp;
 
         setBoardLayout(newBoardLayout);
       }
@@ -304,26 +339,36 @@ const FourIslands = (props) => {
       setShowAcceptButtons(false);
     }
   };
-  
+
   const handleSwapNumbers = () => {
     if (selectedHexes.length === 2) {
       const newBoardLayout = [...boardLayout];
-      if ((newBoardLayout[selectedHexes[0]].fill === "desert" || newBoardLayout[selectedHexes[0]].fill === "ocean") &&
-      (newBoardLayout[selectedHexes[1]].fill === "desert" || newBoardLayout[selectedHexes[1]].fill === "ocean")) {
+      if (
+        (newBoardLayout[selectedHexes[0]].fill === "desert" ||
+          newBoardLayout[selectedHexes[0]].fill === "ocean") &&
+        (newBoardLayout[selectedHexes[1]].fill === "desert" ||
+          newBoardLayout[selectedHexes[1]].fill === "ocean")
+      ) {
         setErrorMessage("No number tokens to swap.");
 
         // Clear the error message after 3 seconds
         setTimeout(() => {
           setErrorMessage("");
         }, 3000);
-    } else if (newBoardLayout[selectedHexes[0]].fill === "desert" || newBoardLayout[selectedHexes[1]].fill === "desert") {
+      } else if (
+        newBoardLayout[selectedHexes[0]].fill === "desert" ||
+        newBoardLayout[selectedHexes[1]].fill === "desert"
+      ) {
         setErrorMessage("Invalid Swap. Desert cannot have a number token.");
 
         // Clear the error message after 3 seconds
         setTimeout(() => {
           setErrorMessage("");
         }, 3000);
-      } else if (newBoardLayout[selectedHexes[0]].fill === "ocean" || newBoardLayout[selectedHexes[1]].fill === "ocean") {
+      } else if (
+        newBoardLayout[selectedHexes[0]].fill === "ocean" ||
+        newBoardLayout[selectedHexes[1]].fill === "ocean"
+      ) {
         setErrorMessage("Invalid Swap. Ocean cannot have a number token.");
 
         // Clear the error message after 3 seconds
@@ -331,9 +376,10 @@ const FourIslands = (props) => {
           setErrorMessage("");
         }, 3000);
       } else {
-        const numberTemp = newBoardLayout[selectedHexes[0]].number
-        newBoardLayout[selectedHexes[0]].number = newBoardLayout[selectedHexes[1]].number
-        newBoardLayout[selectedHexes[1]].number = numberTemp
+        const numberTemp = newBoardLayout[selectedHexes[0]].number;
+        newBoardLayout[selectedHexes[0]].number =
+          newBoardLayout[selectedHexes[1]].number;
+        newBoardLayout[selectedHexes[1]].number = numberTemp;
         setBoardLayout(newBoardLayout);
       }
 
@@ -345,12 +391,14 @@ const FourIslands = (props) => {
   const handleSwapResourcesAndNumbers = () => {
     if (selectedHexes.length === 2) {
       const newBoardLayout = [...boardLayout];
-      const numberTemp = newBoardLayout[selectedHexes[0]].number
-      newBoardLayout[selectedHexes[0]].number = newBoardLayout[selectedHexes[1]].number
-      newBoardLayout[selectedHexes[1]].number = numberTemp
-      const fillTemp = newBoardLayout[selectedHexes[0]].fill
-      newBoardLayout[selectedHexes[0]].fill = newBoardLayout[selectedHexes[1]].fill
-      newBoardLayout[selectedHexes[1]].fill = fillTemp
+      const numberTemp = newBoardLayout[selectedHexes[0]].number;
+      newBoardLayout[selectedHexes[0]].number =
+        newBoardLayout[selectedHexes[1]].number;
+      newBoardLayout[selectedHexes[1]].number = numberTemp;
+      const fillTemp = newBoardLayout[selectedHexes[0]].fill;
+      newBoardLayout[selectedHexes[0]].fill =
+        newBoardLayout[selectedHexes[1]].fill;
+      newBoardLayout[selectedHexes[1]].fill = fillTemp;
 
       setBoardLayout(newBoardLayout);
       setSelectedHexes([]);
@@ -360,11 +408,15 @@ const FourIslands = (props) => {
 
   return (
     <>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh" }}>
-        <div className="hexgrid-container">
-          <div className="board" style={{ zIndex: -1, position: "absolute" }}>
-            <HexGrid width={1600} height={1120} viewBox="-100 -70 200 140"
-              style={{ transform: "rotate(90deg)" }}>
+      <div className="flex items-center justify-center h-[100vh]">
+        <div className="flex items-center justify-center">
+          <div className="-z-[1] absolute flex flex-wrap justify-center m-5">
+            <HexGrid
+              width={1600}
+              height={1120}
+              viewBox="-100 -70 200 140"
+              className="rotate-90"
+            >
               <Layout
                 size={{ x: 10, y: 10 }}
                 flat={true}
@@ -379,11 +431,10 @@ const FourIslands = (props) => {
                     s={hex.s}
                     stroke="black"
                     strokeWidth={0.2}
-                    strokeOpacity={.7}
+                    strokeOpacity={0.7}
                     fill={hex.fill}
                     opacity={hex.fill === "ocean" ? 0.5 : 1}
-                  >
-                  </Hexagon>
+                  ></Hexagon>
                 ))}
                 <Pattern id="forest" link="/assets/images/hexes/wood.png" />
                 <Pattern id="ore" link="/assets/images/hexes/ore.png" />
@@ -395,9 +446,13 @@ const FourIslands = (props) => {
               </Layout>
             </HexGrid>
           </div>
-          <div className="tokens" style={{ zIndex: 1, position: "absolute" }}>
-            <HexGrid width={1600} height={1120} viewBox="-100 -70 200 140"
-              style={{ transform: "rotate(90deg)" }}>
+          <div className="z-[1] absolute">
+            <HexGrid
+              width={1600}
+              height={1120}
+              viewBox="-100 -70 200 140"
+              className="rotate-90"
+            >
               <Layout
                 size={{ x: 10, y: 10 }}
                 flat={true}
@@ -412,12 +467,17 @@ const FourIslands = (props) => {
                     s={hex.s}
                     stroke={selectedHexes.includes(index) ? "red" : null}
                     strokeWidth={selectedHexes.includes(index) ? 0.7 : null}
-                    fill={hex.number ? (twoTwelve && (hex.number === 2 || hex.number === 12)) ? "2-12" : `${hex.number}` : "blank"}
+                    fill={
+                      hex.number
+                        ? twoTwelve && (hex.number === 2 || hex.number === 12)
+                          ? "2-12"
+                          : `${hex.number}`
+                        : "blank"
+                    }
                     onClick={() => handleHexClick(index)}
-                  >
-                  </Hexagon>
+                  ></Hexagon>
                 ))}
-                <Pattern id="2" link="/assets/images/tokens/2.png" style={{ transform: "scale(200)" }} />
+                <Pattern id="2" link="/assets/images/tokens/2.png" />
                 <Pattern id="3" link="/assets/images/tokens/3.png" />
                 <Pattern id="4" link="/assets/images/tokens/4.png" />
                 <Pattern id="5" link="/assets/images/tokens/5.png" />
@@ -433,9 +493,13 @@ const FourIslands = (props) => {
             </HexGrid>
           </div>
         </div>
-        <div className="bridges" style={{ position: "absolute" }}>
-          <HexGrid width={1600} height={1120} viewBox="-100 -70 200 140"
-            style={{ transform: "rotate(90deg)" }}>
+        <div className="absolute">
+          <HexGrid
+            width={1600}
+            height={1120}
+            viewBox="-100 -70 200 140"
+            className="rotate-90"
+          >
             <Layout
               size={{ x: 10, y: 10 }}
               flat={true}
@@ -449,21 +513,42 @@ const FourIslands = (props) => {
                   r={bridge.r + 0.5}
                   s={bridge.s}
                   fill={bridge.fill}
-                >
-                </Hexagon>
+                ></Hexagon>
               ))}
-              <Pattern id="bridges-top-left" link="/assets/images/bridges/bridges-bottom-left.png" />
-              <Pattern id="bridges-top-right" link="/assets/images/bridges/bridges-top-left.png" />
-              <Pattern id="bridges-left" link="/assets/images/bridges/bridges-bottom.png" />
-              <Pattern id="bridges-right" link="/assets/images/bridges/bridges-top.png" />
-              <Pattern id="bridges-bottom-left" link="/assets/images/bridges/bridges-bottom-right.png" />
-              <Pattern id="bridges-bottom-right" link="/assets/images/bridges/bridges-top-right.png" />
+              <Pattern
+                id="bridges-top-left"
+                link="/assets/images/bridges/bridges-bottom-left.png"
+              />
+              <Pattern
+                id="bridges-top-right"
+                link="/assets/images/bridges/bridges-top-left.png"
+              />
+              <Pattern
+                id="bridges-left"
+                link="/assets/images/bridges/bridges-bottom.png"
+              />
+              <Pattern
+                id="bridges-right"
+                link="/assets/images/bridges/bridges-top.png"
+              />
+              <Pattern
+                id="bridges-bottom-left"
+                link="/assets/images/bridges/bridges-bottom-right.png"
+              />
+              <Pattern
+                id="bridges-bottom-right"
+                link="/assets/images/bridges/bridges-top-right.png"
+              />
             </Layout>
           </HexGrid>
         </div>
-        <div className="ports" style={{ position: "absolute" }}>
-          <HexGrid width={1600} height={1120} viewBox="-100 -70 200 140"
-            style={{ transform: "rotate(90deg)" }}>
+        <div className="absolute">
+          <HexGrid
+            width={1600}
+            height={1120}
+            viewBox="-100 -70 200 140"
+            className="rotate-90"
+          >
             <Layout
               size={{ x: 10, y: 10 }}
               flat={true}
@@ -477,42 +562,69 @@ const FourIslands = (props) => {
                   r={port.r + 0.5}
                   s={port.s}
                   fill={port.fill}
-                >
-                </Hexagon>
+                ></Hexagon>
               ))}
               <Pattern id="any" link="/assets/images/ports/any-port.png" />
               <Pattern id="ore-port" link="/assets/images/ports/ore-port.png" />
-              <Pattern id="wheat-port" link="/assets/images/ports/wheat-port.png" />
-              <Pattern id="sheep-port" link="/assets/images/ports/sheep-port.png" />
-              <Pattern id="brick-port" link="/assets/images/ports/brick-port.png" />
-              <Pattern id="wood-port" link="/assets/images/ports/wood-port.png" />
+              <Pattern
+                id="wheat-port"
+                link="/assets/images/ports/wheat-port.png"
+              />
+              <Pattern
+                id="sheep-port"
+                link="/assets/images/ports/sheep-port.png"
+              />
+              <Pattern
+                id="brick-port"
+                link="/assets/images/ports/brick-port.png"
+              />
+              <Pattern
+                id="wood-port"
+                link="/assets/images/ports/wood-port.png"
+              />
             </Layout>
           </HexGrid>
         </div>
       </div>
       {showAcceptButtons && (
-        <div className="accept-buttons" style={{ zIndex: 2, position: 'absolute', bottom: 50, right: '50%', transform: 'translateX(50%)', display: 'flex', justifyContent: 'center' }}>
+        <div className="flex flex-row w-[600px] justify-center z-[2] absolute bottom-[50px] right-1/2 translate-x-1/2 ">
           {showAcceptButtons && isInvalidHexSelected ? (
-            <Button variant="contained" onClick={handleSwapResourcesAndNumbers} style={{ backgroundColor: '#196a7e', color: 'white'}}>
-              swap
-            </Button>
+            <button
+              onClick={handleSwapResourcesAndNumbers}
+              className="bg-[#196a7e] text-white rounded px-4 py-2 font-medium"
+            >
+              SWAP
+            </button>
           ) : (
             <>
-              <Button variant="contained" onClick={handleSwapNumbers} style={{ marginRight: '10%', backgroundColor: '#196a7e', color: 'white' }}>
-                swap numbers
-              </Button>
-              <Button variant="contained" onClick={handleSwapResources} style={{ marginRight: '10%', backgroundColor: '#196a7e', color: 'white' }}>
-                swap resources
-              </Button>
-              <Button variant="contained" onClick={handleSwapResourcesAndNumbers} style={{ backgroundColor: '#196a7e', color: 'white'}}>
-                swap both
-              </Button>
+              <button
+                onClick={handleSwapNumbers}
+                className="bg-[#196a7e] text-white rounded px-4 py-2 font-medium mr-[10%]"
+              >
+                SWAP NUMBERS
+              </button>
+              <button
+                onClick={handleSwapResources}
+                className="bg-[#196a7e] text-white rounded px-4 py-2 font-medium mr-[10%]"
+              >
+                SWAP RESOURCES
+              </button>
+              <button
+                onClick={handleSwapResourcesAndNumbers}
+                className="bg-[#196a7e] text-white rounded px-4 py-2 font-medium"
+              >
+                SWAP BOTH
+              </button>
             </>
           )}
         </div>
       )}
       {errorMessage && (
-        <Alert variant="filled" severity="error" style={{ position: "absolute", top: "20px", left: 0, right: 0, width: "max-content", marginLeft: "auto", marginRight: "auto" }}>
+        <Alert
+          variant="filled"
+          severity="error"
+          className="absolute z-auto top-[20px] left-0 right-0 w-max ml-auto mr-auto"
+        >
           {errorMessage}
         </Alert>
       )}

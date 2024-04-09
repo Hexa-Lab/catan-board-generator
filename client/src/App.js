@@ -175,9 +175,9 @@ function App() {
       {isCitiesAndKnights && <BarbarianTracker position={barbarianPosition} />} {/* Enable barbarian tracker as part of C&K */}
       {diceLoading && <DiceDisplay diceRollResult={{ dice1: '?', dice2: '?' }} eventDieResult={null} isCitiesAndKnights={isCitiesAndKnights} />} {/* Dice loading */}
       {lastRoll && !diceLoading && <DiceDisplay diceRollResult={lastRoll} eventDieResult={eventDieResult} isCitiesAndKnights={isCitiesAndKnights} />} {/* Actual dice roll */}
-      {showGraph && <div className="graph-container"><DiceStats numberStats={diceRolls} eventStats={eventRolls} isCitiesAndKnights={isCitiesAndKnights} /></div>} {/* Dice stats */}
+      {showGraph && <div className="absolute top-[50px] right-[50px] bg-transparent z-[1000]"><DiceStats numberStats={diceRolls} eventStats={eventRolls} isCitiesAndKnights={isCitiesAndKnights} /></div>} {/* Dice stats */}
       {showMenu && <ButtonGuide />}
-      <h4 style={{position: "absolute", left: "3rem", bottom: "2rem", color: "white"}}>Press "M" to {!showMenu ? "show": "hide"} button guide</h4>
+      <h4 className='absolute left-[3rem] bottom-[2rem] text-white'>Press "M" to {!showMenu ? "show" : "hide"} button guide</h4>
     </div>
   );
 }

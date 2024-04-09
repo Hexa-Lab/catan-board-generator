@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { HexGrid, Layout, Pattern, Hexagon, Text } from "react-hexgrid";
-import { Hexes, Bridges, Ports } from './constants';
-import { Button, Alert } from '@mui/material'
+import { Hexes, Bridges, Ports } from "./constants";
+import { Alert } from "@mui/material";
 
 const BlackForest = (props) => {
   const [boardLayout, setBoardLayout] = useState(Hexes);
-  const [bridges,] = useState(Bridges);
-  const [ports,] = useState(Ports);
+  const [bridges] = useState(Bridges);
+  const [ports] = useState(Ports);
   const [selectedHexes, setSelectedHexes] = useState([]);
   const [showAcceptButtons, setShowAcceptButtons] = useState(false);
   const [isInvalidHexSelected, setIsInvalidHexSelected] = useState(false);
-  const { twoTwelve } = props
-  const [errorMessage, setErrorMessage] = useState('');
+  const { twoTwelve } = props;
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     shuffleBoard();
@@ -27,9 +27,9 @@ const BlackForest = (props) => {
       }
     }
 
-    document.addEventListener('keydown', handleKeyDown, false);
+    document.addEventListener("keydown", handleKeyDown, false);
 
-    return () => document.removeEventListener('keydown', handleKeyDown, false);
+    return () => document.removeEventListener("keydown", handleKeyDown, false);
   }, []);
 
   function shuffleArray(array) {
@@ -40,35 +40,41 @@ const BlackForest = (props) => {
   }
 
   function shuffleNonLockedFills() {
-    const nonLockedHexes = boardLayout.filter(hex => !hex.locked);
+    const nonLockedHexes = boardLayout.filter((hex) => !hex.locked);
 
-    const fills = nonLockedHexes.map(hex => hex.fill);
+    const fills = nonLockedHexes.map((hex) => hex.fill);
 
     shuffleArray(fills);
 
-    let newBoardLayout = [...boardLayout]
+    let newBoardLayout = [...boardLayout];
 
     for (let i = 0; i < fills.length; i++) {
       for (let j = 0; j < newBoardLayout.length; j++) {
         if (newBoardLayout[j].locked) {
           continue;
         }
-        newBoardLayout[j].fill = fills[i]
-        fills.shift()
+        newBoardLayout[j].fill = fills[i];
+        fills.shift();
       }
     }
 
     setBoardLayout(newBoardLayout);
   }
 
-
   function placeSixesAndEights(layout) {
     let sixesAndEights = [6, 6, 6, 8, 8, 8];
     shuffleArray(sixesAndEights);
 
-    sixesAndEights.forEach(number => {
+    sixesAndEights.forEach((number) => {
       // Find all hexes that are locked, do not already have a number, and are not adjacent to a 6 or 8.
-      let validHexes = layout.filter(hex => hex.locked && !hex.number && hex.fill !== "desert" && hex.fill !== "ocean" && !isNeighborWithSixOrEight(hex.id, layout));
+      let validHexes = layout.filter(
+        (hex) =>
+          hex.locked &&
+          !hex.number &&
+          hex.fill !== "desert" &&
+          hex.fill !== "ocean" &&
+          !isNeighborWithSixOrEight(hex.id, layout)
+      );
 
       if (validHexes.length > 0) {
         // Randomly select one of the valid hexes
@@ -79,10 +85,14 @@ const BlackForest = (props) => {
     });
   }
 
-
   function assignNumbers(layout, locked) {
-    const numbersForLocked = [2, 3, 4, 4, 4, 5, 5, 5, 5, 9, 9, 9, 9, 10, 10, 10, 11, 12];
-    const numbersForNonLocked = [3, 4, 4, 4, 4, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 8, 8, 8, 8, 8, 9, 9, 9, 9, 9, 10, 10, 10, 10, 11];
+    const numbersForLocked = [
+      2, 3, 4, 4, 4, 5, 5, 5, 5, 9, 9, 9, 9, 10, 10, 10, 11, 12,
+    ];
+    const numbersForNonLocked = [
+      3, 4, 4, 4, 4, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 8, 8, 8, 8, 8, 9, 9, 9, 9, 9,
+      10, 10, 10, 10, 11,
+    ];
     let numbers = locked ? [...numbersForLocked] : [...numbersForNonLocked];
 
     if (locked) {
@@ -94,8 +104,15 @@ const BlackForest = (props) => {
     shuffleArray(numbers);
 
     // First Pass: Assign numbers with all rules applied
-    numbers.forEach(number => {
-      let validHexes = layout.filter(hex => hex.locked === locked && !hex.number && (hex.fill !== "desert" && hex.fill !== "ocean") && !isNeighborWithSameNumber(hex.id, number, layout));
+    numbers.forEach((number) => {
+      let validHexes = layout.filter(
+        (hex) =>
+          hex.locked === locked &&
+          !hex.number &&
+          hex.fill !== "desert" &&
+          hex.fill !== "ocean" &&
+          !isNeighborWithSameNumber(hex.id, number, layout)
+      );
       if (validHexes.length > 0) {
         const randomIndex = Math.floor(Math.random() * validHexes.length);
         validHexes[randomIndex].number = number;
@@ -103,8 +120,13 @@ const BlackForest = (props) => {
     });
 
     // Second Pass: Assign numbers to any remaining unassigned hexes
-    layout.forEach(hex => {
-      if (hex.locked === locked && !hex.number && (hex.fill !== "desert" && hex.fill !== "ocean")) {
+    layout.forEach((hex) => {
+      if (
+        hex.locked === locked &&
+        !hex.number &&
+        hex.fill !== "desert" &&
+        hex.fill !== "ocean"
+      ) {
         // Try to find a number that minimizes rule breaking
         for (let number = 2; number <= 12; number++) {
           if (!isNeighborWithSameNumber(hex.id, number, layout)) {
@@ -129,13 +151,13 @@ const BlackForest = (props) => {
   // Utilize assignNumbers during board setup and shuffling
   function shuffleBoard() {
     // Prepare the board layout, hiding non-locked hexes and clearing numbers
-    let updatedLayout = boardLayout.map(hex => ({
+    let updatedLayout = boardLayout.map((hex) => ({
       ...hex,
       hidden: !hex.locked,
-      number: null // Clear numbers to reassess distribution
+      number: null, // Clear numbers to reassess distribution
     }));
 
-    shuffleNonLockedFills()
+    shuffleNonLockedFills();
 
     // Shuffle and assign numbers separately for locked and non-locked hexes
     assignNumbers(updatedLayout, true); // Locked hexes
@@ -146,30 +168,29 @@ const BlackForest = (props) => {
   }
 
   function isNeighborWithSixOrEight(hexId, layout) {
-    const hex = layout.find(hex => hex.id === hexId);
+    const hex = layout.find((hex) => hex.id === hexId);
     if (!hex || !hex.neighbors) return false;
-    return hex.neighbors.some(neighborId => {
-      const neighbor = layout.find(hex => hex.id === neighborId);
+    return hex.neighbors.some((neighborId) => {
+      const neighbor = layout.find((hex) => hex.id === neighborId);
       return neighbor && (neighbor.number === 6 || neighbor.number === 8);
     });
   }
 
   function isNeighborWithSameNumber(hexId, number, layout) {
-    const hex = layout.find(hex => hex.id === hexId);
+    const hex = layout.find((hex) => hex.id === hexId);
     if (!hex || !hex.neighbors) return false;
-    return hex.neighbors.some(neighborId => {
-      const neighbor = layout.find(hex => hex.id === neighborId);
+    return hex.neighbors.some((neighborId) => {
+      const neighbor = layout.find((hex) => hex.id === neighborId);
       return neighbor && neighbor.number === number;
     });
   }
-
 
   const handleHexClick = (index) => {
     const alreadySelected = selectedHexes.includes(index);
     let newSelectedHexes = selectedHexes;
 
     if (alreadySelected) {
-      newSelectedHexes = selectedHexes.filter(hexIndex => hexIndex !== index);
+      newSelectedHexes = selectedHexes.filter((hexIndex) => hexIndex !== index);
     } else if (selectedHexes.length < 2) {
       newSelectedHexes = [...selectedHexes, index];
     } else {
@@ -177,28 +198,45 @@ const BlackForest = (props) => {
     }
 
     setSelectedHexes(newSelectedHexes);
-    setIsInvalidHexSelected(newSelectedHexes.some(hexIndex => boardLayout[hexIndex].fill === 'desert' || boardLayout[hexIndex].fill === 'ocean'));
+    setIsInvalidHexSelected(
+      newSelectedHexes.some(
+        (hexIndex) =>
+          boardLayout[hexIndex].fill === "desert" ||
+          boardLayout[hexIndex].fill === "ocean"
+      )
+    );
     setShowAcceptButtons(newSelectedHexes.length === 2);
   };
 
   const handleSwapResources = () => {
     if (selectedHexes.length === 2) {
       const newBoardLayout = [...boardLayout];
-      if ((newBoardLayout[selectedHexes[0]].fill === "desert" || newBoardLayout[selectedHexes[0]].fill === "ocean") &&
-        (newBoardLayout[selectedHexes[1]].fill === "desert" || newBoardLayout[selectedHexes[1]].fill === "ocean")) {
-        const fillTemp = newBoardLayout[selectedHexes[0]].fill
-        newBoardLayout[selectedHexes[0]].fill = newBoardLayout[selectedHexes[1]].fill
-        newBoardLayout[selectedHexes[1]].fill = fillTemp
+      if (
+        (newBoardLayout[selectedHexes[0]].fill === "desert" ||
+          newBoardLayout[selectedHexes[0]].fill === "ocean") &&
+        (newBoardLayout[selectedHexes[1]].fill === "desert" ||
+          newBoardLayout[selectedHexes[1]].fill === "ocean")
+      ) {
+        const fillTemp = newBoardLayout[selectedHexes[0]].fill;
+        newBoardLayout[selectedHexes[0]].fill =
+          newBoardLayout[selectedHexes[1]].fill;
+        newBoardLayout[selectedHexes[1]].fill = fillTemp;
 
         setBoardLayout(newBoardLayout);
-      } else if (newBoardLayout[selectedHexes[0]].fill === "desert" || newBoardLayout[selectedHexes[1]].fill === "desert") {
+      } else if (
+        newBoardLayout[selectedHexes[0]].fill === "desert" ||
+        newBoardLayout[selectedHexes[1]].fill === "desert"
+      ) {
         setErrorMessage("Invalid Swap. Desert cannot have a number token.");
 
         // Clear the error message after 3 seconds
         setTimeout(() => {
           setErrorMessage("");
         }, 3000);
-      } else if (newBoardLayout[selectedHexes[0]].fill === "ocean" || newBoardLayout[selectedHexes[1]].fill === "ocean") {
+      } else if (
+        newBoardLayout[selectedHexes[0]].fill === "ocean" ||
+        newBoardLayout[selectedHexes[1]].fill === "ocean"
+      ) {
         setErrorMessage("Invalid Swap. Ocean cannot have a number token.");
 
         // Clear the error message after 3 seconds
@@ -206,9 +244,10 @@ const BlackForest = (props) => {
           setErrorMessage("");
         }, 3000);
       } else {
-        const fillTemp = newBoardLayout[selectedHexes[0]].fill
-        newBoardLayout[selectedHexes[0]].fill = newBoardLayout[selectedHexes[1]].fill
-        newBoardLayout[selectedHexes[1]].fill = fillTemp
+        const fillTemp = newBoardLayout[selectedHexes[0]].fill;
+        newBoardLayout[selectedHexes[0]].fill =
+          newBoardLayout[selectedHexes[1]].fill;
+        newBoardLayout[selectedHexes[1]].fill = fillTemp;
 
         setBoardLayout(newBoardLayout);
       }
@@ -220,22 +259,32 @@ const BlackForest = (props) => {
   const handleSwapNumbers = () => {
     if (selectedHexes.length === 2) {
       const newBoardLayout = [...boardLayout];
-      if ((newBoardLayout[selectedHexes[0]].fill === "desert" || newBoardLayout[selectedHexes[0]].fill === "ocean") &&
-        (newBoardLayout[selectedHexes[1]].fill === "desert" || newBoardLayout[selectedHexes[1]].fill === "ocean")) {
+      if (
+        (newBoardLayout[selectedHexes[0]].fill === "desert" ||
+          newBoardLayout[selectedHexes[0]].fill === "ocean") &&
+        (newBoardLayout[selectedHexes[1]].fill === "desert" ||
+          newBoardLayout[selectedHexes[1]].fill === "ocean")
+      ) {
         setErrorMessage("No number tokens to swap.");
 
         // Clear the error message after 3 seconds
         setTimeout(() => {
           setErrorMessage("");
         }, 3000);
-      } else if (newBoardLayout[selectedHexes[0]].fill === "desert" || newBoardLayout[selectedHexes[1]].fill === "desert") {
+      } else if (
+        newBoardLayout[selectedHexes[0]].fill === "desert" ||
+        newBoardLayout[selectedHexes[1]].fill === "desert"
+      ) {
         setErrorMessage("Invalid Swap. Desert cannot have a number token.");
 
         // Clear the error message after 3 seconds
         setTimeout(() => {
           setErrorMessage("");
         }, 3000);
-      } else if (newBoardLayout[selectedHexes[0]].fill === "ocean" || newBoardLayout[selectedHexes[1]].fill === "ocean") {
+      } else if (
+        newBoardLayout[selectedHexes[0]].fill === "ocean" ||
+        newBoardLayout[selectedHexes[1]].fill === "ocean"
+      ) {
         setErrorMessage("Invalid Swap. Ocean cannot have a number token.");
 
         // Clear the error message after 3 seconds
@@ -243,9 +292,10 @@ const BlackForest = (props) => {
           setErrorMessage("");
         }, 3000);
       } else {
-        const numberTemp = newBoardLayout[selectedHexes[0]].number
-        newBoardLayout[selectedHexes[0]].number = newBoardLayout[selectedHexes[1]].number
-        newBoardLayout[selectedHexes[1]].number = numberTemp
+        const numberTemp = newBoardLayout[selectedHexes[0]].number;
+        newBoardLayout[selectedHexes[0]].number =
+          newBoardLayout[selectedHexes[1]].number;
+        newBoardLayout[selectedHexes[1]].number = numberTemp;
         setBoardLayout(newBoardLayout);
       }
 
@@ -257,12 +307,14 @@ const BlackForest = (props) => {
   const handleSwapResourcesAndNumbers = () => {
     if (selectedHexes.length === 2) {
       const newBoardLayout = [...boardLayout];
-      const numberTemp = newBoardLayout[selectedHexes[0]].number
-      newBoardLayout[selectedHexes[0]].number = newBoardLayout[selectedHexes[1]].number
-      newBoardLayout[selectedHexes[1]].number = numberTemp
-      const fillTemp = newBoardLayout[selectedHexes[0]].fill
-      newBoardLayout[selectedHexes[0]].fill = newBoardLayout[selectedHexes[1]].fill
-      newBoardLayout[selectedHexes[1]].fill = fillTemp
+      const numberTemp = newBoardLayout[selectedHexes[0]].number;
+      newBoardLayout[selectedHexes[0]].number =
+        newBoardLayout[selectedHexes[1]].number;
+      newBoardLayout[selectedHexes[1]].number = numberTemp;
+      const fillTemp = newBoardLayout[selectedHexes[0]].fill;
+      newBoardLayout[selectedHexes[0]].fill =
+        newBoardLayout[selectedHexes[1]].fill;
+      newBoardLayout[selectedHexes[1]].fill = fillTemp;
 
       setBoardLayout(newBoardLayout);
       setSelectedHexes([]);
@@ -273,16 +325,20 @@ const BlackForest = (props) => {
   const handleReveal = (index) => {
     const newBoardLayout = [...boardLayout];
     newBoardLayout[index].hidden = false;
-    setBoardLayout(newBoardLayout)
-  }
+    setBoardLayout(newBoardLayout);
+  };
 
   return (
     <>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh" }}>
-        <div className="hexgrid-container">
-          <div className="board" style={{ zIndex: -1, position: "absolute" }}>
-            <HexGrid width={1200} height={1200} viewBox="-80 -80 160 160"
-              style={{ transform: "rotate(90deg)" }}>
+      <div className="flex items-center justify-center h-[100vh]">
+        <div className="flex items-center justify-center">
+          <div className="z-[-1] absolute flex flex-wrap justify-center m-5">
+            <HexGrid
+              width={1200}
+              height={1200}
+              viewBox="-80 -80 160 160"
+              className="rotate-90"
+            >
               <Layout
                 size={{ x: 10, y: 10 }}
                 flat={true}
@@ -297,11 +353,10 @@ const BlackForest = (props) => {
                     s={hex.s}
                     stroke="black"
                     strokeWidth={hex.hidden ? 0 : 0.2}
-                    strokeOpacity={.7}
+                    strokeOpacity={0.7}
                     fill={hex.hidden ? "hidden" : hex.fill}
                     opacity={hex.fill === "ocean" ? 0.5 : 1}
-                  >
-                  </Hexagon>
+                  ></Hexagon>
                 ))}
                 <Pattern id="forest" link="/assets/images/hexes/wood.png" />
                 <Pattern id="ore" link="/assets/images/hexes/ore.png" />
@@ -314,9 +369,13 @@ const BlackForest = (props) => {
               </Layout>
             </HexGrid>
           </div>
-          <div className="tokens" style={{ zIndex: 1, position: "absolute" }}>
-            <HexGrid width={1200} height={1200} viewBox="-80 -80 160 160"
-              style={{ transform: "rotate(90deg)" }}>
+          <div className="z-[1] absolute ">
+            <HexGrid
+              width={1200}
+              height={1200}
+              viewBox="-80 -80 160 160"
+              className="rotate-90"
+            >
               <Layout
                 size={{ x: 10, y: 10 }}
                 flat={true}
@@ -332,18 +391,26 @@ const BlackForest = (props) => {
                     stroke={selectedHexes.includes(index) ? "red" : null}
                     strokeWidth={selectedHexes.includes(index) ? 0.7 : null}
                     fill={
-                      (hex.number && !hex.hidden ? (twoTwelve && (hex.number === 2 || hex.number === 12)) ? "2-12" : `${hex.number}` : "blank")}
-                    onClick={hex.hidden ? () => handleReveal(index) : () => handleHexClick(index)}
+                      hex.number && !hex.hidden
+                        ? twoTwelve && (hex.number === 2 || hex.number === 12)
+                          ? "2-12"
+                          : `${hex.number}`
+                        : "blank"
+                    }
+                    onClick={
+                      hex.hidden
+                        ? () => handleReveal(index)
+                        : () => handleHexClick(index)
+                    }
                     onContextMenu={(e) => {
-                      e.preventDefault()
+                      e.preventDefault();
                       let layout = [...boardLayout];
                       layout[index].hidden = true;
                       setBoardLayout(layout);
                     }}
-                  >
-                  </Hexagon>
+                  ></Hexagon>
                 ))}
-                <Pattern id="2" link="/assets/images/tokens/2.png" style={{ transform: "scale(200)" }} />
+                <Pattern id="2" link="/assets/images/tokens/2.png" />
                 <Pattern id="3" link="/assets/images/tokens/3.png" />
                 <Pattern id="4" link="/assets/images/tokens/4.png" />
                 <Pattern id="5" link="/assets/images/tokens/5.png" />
@@ -359,9 +426,13 @@ const BlackForest = (props) => {
             </HexGrid>
           </div>
         </div>
-        <div className="bridges" style={{ position: "absolute" }}>
-          <HexGrid width={1200} height={1200} viewBox="-80 -80 160 160"
-            style={{ transform: "rotate(90deg)" }}>
+        <div className="absolute">
+          <HexGrid
+            width={1200}
+            height={1200}
+            viewBox="-80 -80 160 160"
+            className="rotate-90"
+          >
             <Layout
               size={{ x: 10, y: 10 }}
               flat={true}
@@ -375,21 +446,42 @@ const BlackForest = (props) => {
                   r={bridge.r}
                   s={bridge.s}
                   fill={bridge.fill}
-                >
-                </Hexagon>
+                ></Hexagon>
               ))}
-              <Pattern id="bridges-top-left" link="/assets/images/bridges/bridges-bottom-left.png" />
-              <Pattern id="bridges-top-right" link="/assets/images/bridges/bridges-top-left.png" />
-              <Pattern id="bridges-left" link="/assets/images/bridges/bridges-bottom.png" />
-              <Pattern id="bridges-right" link="/assets/images/bridges/bridges-top.png" />
-              <Pattern id="bridges-bottom-left" link="/assets/images/bridges/bridges-bottom-right.png" />
-              <Pattern id="bridges-bottom-right" link="/assets/images/bridges/bridges-top-right.png" />
+              <Pattern
+                id="bridges-top-left"
+                link="/assets/images/bridges/bridges-bottom-left.png"
+              />
+              <Pattern
+                id="bridges-top-right"
+                link="/assets/images/bridges/bridges-top-left.png"
+              />
+              <Pattern
+                id="bridges-left"
+                link="/assets/images/bridges/bridges-bottom.png"
+              />
+              <Pattern
+                id="bridges-right"
+                link="/assets/images/bridges/bridges-top.png"
+              />
+              <Pattern
+                id="bridges-bottom-left"
+                link="/assets/images/bridges/bridges-bottom-right.png"
+              />
+              <Pattern
+                id="bridges-bottom-right"
+                link="/assets/images/bridges/bridges-top-right.png"
+              />
             </Layout>
           </HexGrid>
         </div>
-        <div className="ports" style={{ position: "absolute" }}>
-          <HexGrid width={1200} height={1200} viewBox="-80 -80 160 160"
-            style={{ transform: "rotate(90deg)" }}>
+        <div className="absolute">
+          <HexGrid
+            width={1200}
+            height={1200}
+            viewBox="-80 -80 160 160"
+            className="rotate-90"
+          >
             <Layout
               size={{ x: 10, y: 10 }}
               flat={true}
@@ -403,42 +495,69 @@ const BlackForest = (props) => {
                   r={port.r}
                   s={port.s}
                   fill={port.fill}
-                >
-                </Hexagon>
+                ></Hexagon>
               ))}
               <Pattern id="any" link="/assets/images/ports/any-port.png" />
               <Pattern id="ore-port" link="/assets/images/ports/ore-port.png" />
-              <Pattern id="wheat-port" link="/assets/images/ports/wheat-port.png" />
-              <Pattern id="sheep-port" link="/assets/images/ports/sheep-port.png" />
-              <Pattern id="brick-port" link="/assets/images/ports/brick-port.png" />
-              <Pattern id="wood-port" link="/assets/images/ports/wood-port.png" />
+              <Pattern
+                id="wheat-port"
+                link="/assets/images/ports/wheat-port.png"
+              />
+              <Pattern
+                id="sheep-port"
+                link="/assets/images/ports/sheep-port.png"
+              />
+              <Pattern
+                id="brick-port"
+                link="/assets/images/ports/brick-port.png"
+              />
+              <Pattern
+                id="wood-port"
+                link="/assets/images/ports/wood-port.png"
+              />
             </Layout>
           </HexGrid>
         </div>
       </div>
       {showAcceptButtons && (
-        <div className="accept-buttons" style={{ zIndex: 2, position: 'absolute', bottom: 50, right: '50%', transform: 'translateX(50%)', display: 'flex', justifyContent: 'center' }}>
+        <div className="z-[2] absolute bottom-[50px] right-1/2 translate-x-1/2 flex justify-center flex-row w-[600px]">
           {showAcceptButtons && isInvalidHexSelected ? (
-            <Button variant="contained" onClick={handleSwapResourcesAndNumbers} style={{ backgroundColor: '#196a7e', color: 'white' }}>
-              swap
-            </Button>
+            <button
+              onClick={handleSwapResourcesAndNumbers}
+              className="bg-[#196a7e] text-white rounded px-4 py-2 font-medium"
+            >
+              SWAP
+            </button>
           ) : (
             <>
-              <Button variant="contained" onClick={handleSwapNumbers} style={{ marginRight: '10%', backgroundColor: '#196a7e', color: 'white' }}>
-                swap numbers
-              </Button>
-              <Button variant="contained" onClick={handleSwapResources} style={{ marginRight: '10%', backgroundColor: '#196a7e', color: 'white' }}>
-                swap resources
-              </Button>
-              <Button variant="contained" onClick={handleSwapResourcesAndNumbers} style={{ backgroundColor: '#196a7e', color: 'white' }}>
-                swap both
-              </Button>
+              <button
+                onClick={handleSwapNumbers}
+                className="bg-[#196a7e] text-white rounded px-4 py-2 font-medium mr-[10%]"
+              >
+                SWAP NUMBERS
+              </button>
+              <button
+                onClick={handleSwapResources}
+                className="bg-[#196a7e] text-white rounded px-4 py-2 font-medium mr-[10%]"
+              >
+                SWAP RESOURCES
+              </button>
+              <button
+                onClick={handleSwapResourcesAndNumbers}
+                className="bg-[#196a7e] text-white rounded px-4 py-2 font-medium"
+              >
+                SWAP BOTH
+              </button>
             </>
           )}
         </div>
       )}
       {errorMessage && (
-        <Alert variant="filled" severity="error" style={{ position: "absolute", top: "20px", left: 0, right: 0, width: "max-content", marginLeft: "auto", marginRight: "auto" }}>
+        <Alert
+          variant="filled"
+          severity="error"
+          className="absolute z-auto top-[20px] left-0 right-0 w-max ml-auto mr-auto"
+        >
           {errorMessage}
         </Alert>
       )}

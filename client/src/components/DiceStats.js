@@ -1,67 +1,63 @@
-import React, { useState, useEffect } from 'react';
-import { BarChart } from '@mui/x-charts';
-import { ToggleButton, ToggleButtonGroup } from '@mui/material'
+import React, { useState, useEffect } from "react";
+import { BarChart } from "@mui/x-charts";
+import { ToggleButton, ToggleButtonGroup } from "@mui/material";
 
 const DiceStats = ({ numberStats, eventStats, isCitiesAndKnights }) => {
-    const [group, setGroup] = useState('numbers')
+  const [group, setGroup] = useState("numbers");
 
-    useEffect(() => {
-        if (!isCitiesAndKnights) {
-            setGroup("numbers")
-        }
-    }, [isCitiesAndKnights])
-
-    const handleChange = (event, newGroup) => {
-        if (newGroup !== null) {
-            setGroup(newGroup)
-        }
+  useEffect(() => {
+    if (!isCitiesAndKnights) {
+      setGroup("numbers");
     }
+  }, [isCitiesAndKnights]);
 
-    return (
-        <div style={{ position: 'absolute', top: 30, right: 30, width: "470px", height: "max-content", backgroundColor: "rgba(255, 255, 255, 0.5)", borderRadius: "30px" }}>
-            {isCitiesAndKnights &&
-                <div style={{ width: "100%", display: "flex", justifyContent: "space-evenly", marginTop: 0 }}>
-                        <ToggleButtonGroup
-                            exclusive
-                            onChange={handleChange}
-                            value={group}
-                            style={{ width: "100%", borderTopLeftRadius: "30px", borderTopRightRadius: "30px"}}
-                        >
-                            <ToggleButton style={{flex: 1, borderTopLeftRadius: "30px", borderBottomLeftRadius: "0px"}} value="numbers">Numbers</ToggleButton>
-                            <ToggleButton style={{flex: 1, borderTopRightRadius: "30px", borderBottomRightRadius: "0px"}} value="event">Event Die</ToggleButton>
-                        </ToggleButtonGroup>
-                </div>
-            }
-            {group === "numbers" &&
-                <div>
-                    <BarChart
-                        dataset={numberStats}
-                        xAxis={[{ scaleType: 'band', dataKey: "number", label: "Number" }]}
-                        yAxis={[{ label: "Amount Rolled" }]}
-                        series={[
-                            { dataKey: 'value', color: "rgb(60, 60, 60)" }
-                        ]}
-                        width={500}
-                        height={300}
-                    />
-                </div>
-            }
-            {group === "event" &&
-                <div>
-                    <BarChart
-                        dataset={eventStats}
-                        xAxis={[{ scaleType: 'band', dataKey: "side", label: "Event" }]}
-                        yAxis={[{ label: "Amount Rolled" }]}
-                        series={[
-                            { dataKey: 'value', color: "rgb(60, 60, 60)" }
-                        ]}
-                        width={500}
-                        height={300}
-                    />
-                </div>
-            }
+  const handleChange = (event, newGroup) => {
+    if (newGroup !== null) {
+      setGroup(newGroup);
+    }
+  };
+
+  return (
+    <div className="absolute top-[30px] right-[30px] w-[470px] h-max bg-white bg-opacity-50 overflow-hidden rounded-2xl ">
+      {isCitiesAndKnights && (
+        <ToggleButtonGroup
+          exclusive
+          onChange={handleChange}
+          value={group}
+          className="w-full overflow-auto"
+        >
+          <ToggleButton className="flex-1" value="numbers">
+            Numbers
+          </ToggleButton>
+          <ToggleButton className="flex-1" value="event">
+            Event Die
+          </ToggleButton>
+        </ToggleButtonGroup>
+      )}
+      {group === "numbers" && (
+        <BarChart
+          dataset={numberStats}
+          xAxis={[{ scaleType: "band", dataKey: "number", label: "Number" }]}
+          yAxis={[{ label: "Amount Rolled" }]}
+          series={[{ dataKey: "value", color: "rgb(60, 60, 60)" }]}
+          width={500}
+          height={300}
+        />
+      )}
+      {group === "event" && (
+        <div>
+          <BarChart
+            dataset={eventStats}
+            xAxis={[{ scaleType: "band", dataKey: "side", label: "Event" }]}
+            yAxis={[{ label: "Amount Rolled" }]}
+            series={[{ dataKey: "value", color: "rgb(60, 60, 60)" }]}
+            width={500}
+            height={300}
+          />
         </div>
-    );
+      )}
+    </div>
+  );
 };
 
 export default DiceStats;
