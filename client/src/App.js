@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import "./App.css";
 import BaseGame from "./modes/base/game";
 import ExtendedBaseGame from "./modes/extended-base/game";
@@ -39,6 +39,81 @@ function App() {
     { side: "green", value: 0 },
     { side: "yellow", value: 0 },
   ]);
+
+  const performDiceRoll = useCallback(() => {
+    const firstDice = Math.floor(Math.random() * 6) + 1;
+    const secondDice = Math.floor(Math.random() * 6) + 1;
+    const roll = firstDice + secondDice;
+    const eventDie = ["pirate", "pirate", "pirate", "green", "blue", "yellow"][
+      Math.floor(Math.random() * 6)
+    ];
+
+    if (isCitiesAndKnights) {
+      setEventDieResult(eventDie); // Set event die result
+      setEventRolls((prevRolls) =>
+        prevRolls.map((eventRoll) => {
+          if (eventRoll.side === eventDie) {
+            return { ...eventRoll, value: eventRoll.value + 1 };
+          }
+          return eventRoll;
+        })
+      );
+    }
+
+    if (eventDie === "pirate" && isCitiesAndKnights) {
+      setBarbarianPosition((prevPosition) => {
+        if (prevPosition + 1 >= 7) {
+          // Assuming 7 is the max position before reset
+          setTimeout(() => {
+            setBarbarianPosition(0); // Reset after 3 seconds
+          }, 1000);
+          return 7; // Return the max position and wait before resetting
+        } else {
+          return prevPosition + 1;
+        }
+      });
+    }
+
+    setLastRoll({ dice1: firstDice, dice2: secondDice, sum: roll }); // Store the result to display
+    setDiceRolls((prevRolls) =>
+      prevRolls.map((diceRoll) => {
+        // If twoTwelve is true and the roll is 2 or 12, increase both 2 and 12
+        if (twoTwelve && (roll === 2 || roll === 12)) {
+          if (diceRoll.number === 2 || diceRoll.number === 12) {
+            return { ...diceRoll, value: diceRoll.value + 1 };
+          }
+        } else if (diceRoll.number === roll) {
+          // If twoTwelve is not true, or the roll is not 2 or 12, proceed as before
+          return { ...diceRoll, value: diceRoll.value + 1 };
+        }
+        return diceRoll;
+      })
+    );
+  }, [twoTwelve, isCitiesAndKnights]);
+
+
+  const handleDiceRoll = useCallback(() => {
+    setDiceLoading(true);
+    const intervalTime = 100;
+    const loadingDuration = 400;
+
+    let elapsed = 0;
+    const interval = setInterval(() => {
+      if (elapsed >= loadingDuration) {
+        clearInterval(interval);
+        performDiceRoll();
+        setDiceLoading(false);
+      } else {
+        setLastRoll({
+          firstDice: Math.floor(Math.random() * 6) + 1,
+          secondDice: Math.floor(Math.random() * 6) + 1,
+          sum: null,
+        });
+
+        elapsed += intervalTime;
+      }
+    }, intervalTime);
+  }, [performDiceRoll]);
 
   useEffect(() => {
     function handleKeyDown(e) {
@@ -96,81 +171,7 @@ function App() {
     document.addEventListener("keydown", handleKeyDown, false);
 
     return () => document.removeEventListener("keydown", handleKeyDown, false);
-  }, [twoTwelve, isCitiesAndKnights, showGraph, showMenu]);
-
-  const handleDiceRoll = () => {
-    setDiceLoading(true);
-    const intervalTime = 100;
-    const loadingDuration = 700;
-
-    let elapsed = 0;
-    const interval = setInterval(() => {
-      if (elapsed >= loadingDuration) {
-        clearInterval(interval);
-        performDiceRoll();
-        setDiceLoading(false);
-      } else {
-        setLastRoll({
-          firstDice: Math.floor(Math.random() * 6) + 1,
-          secondDice: Math.floor(Math.random() * 6) + 1,
-          sum: null,
-        });
-
-        elapsed += intervalTime;
-      }
-    }, intervalTime);
-  };
-
-  const performDiceRoll = () => {
-    const firstDice = Math.floor(Math.random() * 6) + 1;
-    const secondDice = Math.floor(Math.random() * 6) + 1;
-    const roll = firstDice + secondDice;
-    const eventDie = ["pirate", "pirate", "pirate", "green", "blue", "yellow"][
-      Math.floor(Math.random() * 6)
-    ];
-
-    if (isCitiesAndKnights) {
-      setEventDieResult(eventDie); // Set event die result
-      setEventRolls((prevRolls) =>
-        prevRolls.map((eventRoll) => {
-          if (eventRoll.side === eventDie) {
-            return { ...eventRoll, value: eventRoll.value + 1 };
-          }
-          return eventRoll;
-        })
-      );
-    }
-
-    if (eventDie === "pirate" && isCitiesAndKnights) {
-      setBarbarianPosition((prevPosition) => {
-        if (prevPosition + 1 >= 7) {
-          // Assuming 7 is the max position before reset
-          setTimeout(() => {
-            setBarbarianPosition(0); // Reset after 3 seconds
-          }, 1000);
-          return 7; // Return the max position and wait before resetting
-        } else {
-          return prevPosition + 1;
-        }
-      });
-    }
-
-    setLastRoll({ dice1: firstDice, dice2: secondDice, sum: roll }); // Store the result to display
-    setDiceRolls((prevRolls) =>
-      prevRolls.map((diceRoll) => {
-        // If twoTwelve is true and the roll is 2 or 12, increase both 2 and 12
-        if (twoTwelve && (roll === 2 || roll === 12)) {
-          if (diceRoll.number === 2 || diceRoll.number === 12) {
-            return { ...diceRoll, value: diceRoll.value + 1 };
-          }
-        } else if (diceRoll.number === roll) {
-          // If twoTwelve is not true, or the roll is not 2 or 12, proceed as before
-          return { ...diceRoll, value: diceRoll.value + 1 };
-        }
-        return diceRoll;
-      })
-    );
-  };
+  }, [twoTwelve, isCitiesAndKnights, showGraph, showMenu, handleDiceRoll]);
 
   return (
     <div className="App">

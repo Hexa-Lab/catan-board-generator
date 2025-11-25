@@ -15,10 +15,10 @@ const DiceDisplay = ({
 
   let randomEventDie = [
     "pirate",
-    "pirate",
-    "pirate",
     "green",
+    "pirate",
     "blue",
+    "pirate",
     "yellow",
   ][Math.floor(Math.random() * 6)];
 

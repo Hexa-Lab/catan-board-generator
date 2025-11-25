@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { HexGrid, Layout, Pattern, Hexagon, Text } from "react-hexgrid";
+import { HexGrid, Layout, Pattern, Hexagon } from "react-hexgrid";
 import { Hexes, Bridges, Ports } from "./constants";
 import { Alert } from "@mui/material";
 
@@ -30,7 +30,7 @@ const BlackForest = (props) => {
     document.addEventListener("keydown", handleKeyDown, false);
 
     return () => document.removeEventListener("keydown", handleKeyDown, false);
-  }, []);
+  });
 
   function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
