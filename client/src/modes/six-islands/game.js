@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { HexGrid, Layout, Pattern, Hexagon } from "react-hexgrid";
+import { HexGrid, Layout, Pattern, Hexagon, Text } from "react-hexgrid";
 import { Hexes, Bridges, Ports } from "./constants";
 import { Alert } from "@mui/material";
+import { shuffleBoard } from "./shufflers"
 
-const BlackForest = (props) => {
+const SixIslands = (props) => {
   const [boardLayout, setBoardLayout] = useState(Hexes);
   const [bridges] = useState(Bridges);
   const [ports] = useState(Ports);
@@ -14,176 +15,23 @@ const BlackForest = (props) => {
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
-    shuffleBoard();
-  }, []);
+    setBoardLayout(() => shuffleBoard(Hexes, Ports, twoTwelve));
+  }, [twoTwelve]);
+
 
   useEffect(() => {
     function handleKeyDown(e) {
-      e.preventDefault();
-
-      // Key: 5
-      if (e.keyCode === 53) {
-        shuffleBoard();
+      if (e.keyCode === 52) {
+        setBoardLayout(prev =>
+          shuffleBoard(prev, Ports, twoTwelve)
+        );
       }
     }
 
-    document.addEventListener("keydown", handleKeyDown, false);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [twoTwelve]);
 
-    return () => document.removeEventListener("keydown", handleKeyDown, false);
-  });
-
-  function shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
-    }
-  }
-
-  function shuffleNonLockedFills() {
-    const nonLockedHexes = boardLayout.filter((hex) => !hex.locked);
-
-    const fills = nonLockedHexes.map((hex) => hex.fill);
-
-    shuffleArray(fills);
-
-    let newBoardLayout = [...boardLayout];
-
-    for (let i = 0; i < fills.length; i++) {
-      for (let j = 0; j < newBoardLayout.length; j++) {
-        if (newBoardLayout[j].locked) {
-          continue;
-        }
-        newBoardLayout[j].fill = fills[i];
-        fills.shift();
-      }
-    }
-
-    setBoardLayout(newBoardLayout);
-  }
-
-  function placeSixesAndEights(layout) {
-    let sixesAndEights = [6, 6, 6, 8, 8, 8];
-    shuffleArray(sixesAndEights);
-
-    sixesAndEights.forEach((number) => {
-      // Find all hexes that are locked, do not already have a number, and are not adjacent to a 6 or 8.
-      let validHexes = layout.filter(
-        (hex) =>
-          hex.locked &&
-          !hex.number &&
-          hex.fill !== "desert" &&
-          hex.fill !== "ocean" &&
-          !isNeighborWithSixOrEight(hex.id, layout)
-      );
-
-      if (validHexes.length > 0) {
-        // Randomly select one of the valid hexes
-        const randomIndex = Math.floor(Math.random() * validHexes.length);
-        const selectedHex = validHexes[randomIndex];
-        selectedHex.number = number;
-      }
-    });
-  }
-
-  function assignNumbers(layout, locked) {
-    const numbersForLocked = [
-      2, 3, 4, 4, 4, 5, 5, 5, 5, 9, 9, 9, 9, 10, 10, 10, 11, 12,
-    ];
-    const numbersForNonLocked = [
-      3, 4, 4, 4, 4, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 8, 8, 8, 8, 8, 9, 9, 9, 9, 9,
-      10, 10, 10, 10, 11,
-    ];
-    let numbers = locked ? [...numbersForLocked] : [...numbersForNonLocked];
-
-    if (locked) {
-      // Handle special placement for 6s and 8s among locked hexes
-      placeSixesAndEights(layout);
-    }
-
-    // Shuffle remaining numbers for randomness
-    shuffleArray(numbers);
-
-    // First Pass: Assign numbers with all rules applied
-    numbers.forEach((number) => {
-      let validHexes = layout.filter(
-        (hex) =>
-          hex.locked === locked &&
-          !hex.number &&
-          hex.fill !== "desert" &&
-          hex.fill !== "ocean" &&
-          !isNeighborWithSameNumber(hex.id, number, layout)
-      );
-      if (validHexes.length > 0) {
-        const randomIndex = Math.floor(Math.random() * validHexes.length);
-        validHexes[randomIndex].number = number;
-      }
-    });
-
-    // Second Pass: Assign numbers to any remaining unassigned hexes
-    layout.forEach((hex) => {
-      if (
-        hex.locked === locked &&
-        !hex.number &&
-        hex.fill !== "desert" &&
-        hex.fill !== "ocean"
-      ) {
-        // Try to find a number that minimizes rule breaking
-        for (let number = 2; number <= 12; number++) {
-          if (!isNeighborWithSameNumber(hex.id, number, layout)) {
-            hex.number = number;
-            break;
-          }
-        }
-        // As a last resort, assign any number if still unassigned
-        if (!hex.number) {
-          hex.number = findLeastProblematicNumber(hex, layout);
-        }
-      }
-    });
-  }
-
-  function findLeastProblematicNumber(hex, layout) {
-    // This function aims to find a number that minimally violates the rules
-    // For simplicity, just return a random number here or implement your logic
-    return Math.floor(Math.random() * (12 - 2 + 1)) + 2; // Random between 2 and 12
-  }
-
-  // Utilize assignNumbers during board setup and shuffling
-  function shuffleBoard() {
-    // Prepare the board layout, hiding non-locked hexes and clearing numbers
-    let updatedLayout = boardLayout.map((hex) => ({
-      ...hex,
-      hidden: !hex.locked,
-      number: null, // Clear numbers to reassess distribution
-    }));
-
-    shuffleNonLockedFills();
-
-    // Shuffle and assign numbers separately for locked and non-locked hexes
-    assignNumbers(updatedLayout, true); // Locked hexes
-    assignNumbers(updatedLayout, false); // Non-locked hexes
-
-    // Update the board layout state
-    setBoardLayout(updatedLayout);
-  }
-
-  function isNeighborWithSixOrEight(hexId, layout) {
-    const hex = layout.find((hex) => hex.id === hexId);
-    if (!hex || !hex.neighbors) return false;
-    return hex.neighbors.some((neighborId) => {
-      const neighbor = layout.find((hex) => hex.id === neighborId);
-      return neighbor && (neighbor.number === 6 || neighbor.number === 8);
-    });
-  }
-
-  function isNeighborWithSameNumber(hexId, number, layout) {
-    const hex = layout.find((hex) => hex.id === hexId);
-    if (!hex || !hex.neighbors) return false;
-    return hex.neighbors.some((neighborId) => {
-      const neighbor = layout.find((hex) => hex.id === neighborId);
-      return neighbor && neighbor.number === number;
-    });
-  }
 
   const handleHexClick = (index) => {
     const alreadySelected = selectedHexes.includes(index);
@@ -322,21 +170,15 @@ const BlackForest = (props) => {
     }
   };
 
-  const handleReveal = (index) => {
-    const newBoardLayout = [...boardLayout];
-    newBoardLayout[index].hidden = false;
-    setBoardLayout(newBoardLayout);
-  };
-
   return (
     <>
       <div className="flex items-center justify-center h-[100vh]">
         <div className="flex items-center justify-center">
-          <div className="z-[-1] absolute flex flex-wrap justify-center m-5">
+          <div className="-z-[1] absolute flex flex-wrap justify-center m-5">
             <HexGrid
-              width={1200}
-              height={1200}
-              viewBox="-80 -80 160 160"
+              width={1600}
+              height={1500}
+              viewBox="-100 -70 200 140"
               className="rotate-90"
             >
               <Layout
@@ -348,13 +190,13 @@ const BlackForest = (props) => {
                 {boardLayout.map((hex, index) => (
                   <Hexagon
                     key={index}
-                    q={hex.q}
-                    r={hex.r}
+                    q={hex.q - 1}
+                    r={hex.r + 0.5}
                     s={hex.s}
                     stroke="black"
-                    strokeWidth={hex.hidden ? 0 : 0.2}
+                    strokeWidth={0.2}
                     strokeOpacity={0.7}
-                    fill={hex.hidden ? "hidden" : hex.fill}
+                    fill={hex.fill}
                     opacity={hex.fill === "ocean" ? 0.5 : 1}
                   ></Hexagon>
                 ))}
@@ -365,15 +207,14 @@ const BlackForest = (props) => {
                 <Pattern id="brick" link="/assets/images/hexes/brick.png" />
                 <Pattern id="desert" link="/assets/images/hexes/desert.png" />
                 <Pattern id="ocean" link="/assets/images/hexes/ocean.png" />
-                <Pattern id="hidden" link="/assets/images/hexes/hidden.png" />
               </Layout>
             </HexGrid>
           </div>
-          <div className="z-[1] absolute ">
+          <div className="z-[1] absolute">
             <HexGrid
-              width={1200}
-              height={1200}
-              viewBox="-80 -80 160 160"
+              width={1600}
+              height={1500}
+              viewBox="-100 -70 200 140"
               className="rotate-90"
             >
               <Layout
@@ -385,29 +226,19 @@ const BlackForest = (props) => {
                 {boardLayout.map((hex, index) => (
                   <Hexagon
                     key={index}
-                    q={hex.q}
-                    r={hex.r}
+                    q={hex.q - 1}
+                    r={hex.r + 0.5}
                     s={hex.s}
                     stroke={selectedHexes.includes(index) ? "red" : null}
                     strokeWidth={selectedHexes.includes(index) ? 0.7 : null}
                     fill={
-                      hex.number && !hex.hidden
+                      hex.number
                         ? twoTwelve && (hex.number === 2 || hex.number === 12)
                           ? "2-12"
                           : `${hex.number}`
                         : "blank"
                     }
-                    onClick={
-                      hex.hidden
-                        ? () => handleReveal(index)
-                        : () => handleHexClick(index)
-                    }
-                    onContextMenu={(e) => {
-                      e.preventDefault();
-                      let layout = [...boardLayout];
-                      layout[index].hidden = true;
-                      setBoardLayout(layout);
-                    }}
+                    onClick={() => handleHexClick(index)}
                   ></Hexagon>
                 ))}
                 <Pattern id="2" link="/assets/images/tokens/2.png" />
@@ -428,9 +259,9 @@ const BlackForest = (props) => {
         </div>
         <div className="absolute">
           <HexGrid
-            width={1200}
-            height={1200}
-            viewBox="-80 -80 160 160"
+            width={1600}
+            height={1500}
+            viewBox="-100 -70 200 140"
             className="rotate-90"
           >
             <Layout
@@ -442,8 +273,8 @@ const BlackForest = (props) => {
               {bridges.map((bridge, index) => (
                 <Hexagon
                   key={index}
-                  q={bridge.q}
-                  r={bridge.r}
+                  q={bridge.q - 1}
+                  r={bridge.r + 0.5}
                   s={bridge.s}
                   fill={bridge.fill}
                 ></Hexagon>
@@ -477,9 +308,9 @@ const BlackForest = (props) => {
         </div>
         <div className="absolute">
           <HexGrid
-            width={1200}
-            height={1200}
-            viewBox="-80 -80 160 160"
+            width={1600}
+            height={1500}
+            viewBox="-100 -70 200 140"
             className="rotate-90"
           >
             <Layout
@@ -491,8 +322,8 @@ const BlackForest = (props) => {
               {ports.map((port, index) => (
                 <Hexagon
                   key={index}
-                  q={port.q}
-                  r={port.r}
+                  q={port.q - 1}
+                  r={port.r + 0.5}
                   s={port.s}
                   fill={port.fill}
                 ></Hexagon>
@@ -520,7 +351,7 @@ const BlackForest = (props) => {
         </div>
       </div>
       {showAcceptButtons && (
-        <div className="z-[2] absolute bottom-[50px] right-1/2 translate-x-1/2 flex justify-center flex-row w-[600px]">
+        <div className="flex flex-row w-[600px] justify-center z-[2] absolute bottom-[50px] right-1/2 translate-x-1/2 ">
           {showAcceptButtons && isInvalidHexSelected ? (
             <button
               onClick={handleSwapResourcesAndNumbers}
@@ -565,4 +396,4 @@ const BlackForest = (props) => {
   );
 };
 
-export default BlackForest;
+export default SixIslands;

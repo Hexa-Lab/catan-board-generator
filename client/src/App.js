@@ -8,6 +8,7 @@ import DiceDisplay from "./components/DiceDisplay";
 import DiceStats from "./components/DiceStats";
 import BlackForest from "./modes/black-forest/game";
 import { ButtonGuide } from "./components/ButtonGuide";
+import SixIslands from "./modes/six-islands/game";
 
 function App() {
   const [lastRoll, setLastRoll] = useState(null);
@@ -134,8 +135,13 @@ function App() {
         setGameMode("fourIslands");
       }
 
-      // Key: 3
+      // Key: 4
       if (e.keyCode === 52) {
+        setGameMode("sixIslands");
+      }
+
+      // Key: 5
+      if (e.keyCode === 53) {
         setGameMode("blackForest");
       }
 
@@ -180,6 +186,7 @@ function App() {
         <ExtendedBaseGame twoTwelve={twoTwelve} />
       )}
       {gameMode === "fourIslands" && <FourIslands twoTwelve={twoTwelve} />}
+      {gameMode === "sixIslands" && <SixIslands twoTwelve={twoTwelve} />}
       {gameMode === "blackForest" && <BlackForest twoTwelve={twoTwelve} />}
       {isCitiesAndKnights && (
         <BarbarianTracker position={barbarianPosition} />
